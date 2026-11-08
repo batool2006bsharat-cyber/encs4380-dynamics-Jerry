@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Module 4: Guess the sensor | ENCS4380 Dynamics Toolkit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+  <style>
+    
+    :root {
+      --paper:#f3f9ff; --surface:#ffffff; --ink:#233752; --muted:#62758d;
+      --line:#dceaf6; --grid:#edf5fc;
+      --signal:#f16da3; --pole:#4b9ddd; --band:#d99b44; --ghost:#93acc3;
+      --good:#26886a; --bad:#c94b67; --good-bg:#e8f8f1; --bad-bg:#ffeaf1;
+      --sans:Arial,Helvetica,sans-serif;
+      color-scheme:light;
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--paper); color:var(--ink); font:16px/1.6 var(--sans); }
+    [hidden] { display:none !important; }
+    .wrap { max-width:1060px; margin:30px auto; padding:30px; border-radius:18px; background:var(--surface); box-shadow:0 12px 40px rgba(68,133,186,.09); }
+    a { color:#438ec7; }
+    .crumbs { color:var(--muted); font-size:.88rem; margin-bottom:14px; }
+    h1,h2,h3 { font-family:var(--sans); font-weight:700; line-height:1.25; margin:0; }
+    h1 { font-size:clamp(1.9rem,4vw,2.7rem); color:#286b9c; }
+    h2 { font-size:1.35rem; margin-bottom:10px; color:#326e9c; }
+    h3 { font-size:1.03rem; margin-bottom:8px; }
+    .lede { color:var(--muted); max-width:75ch; margin:10px 0 23px; }
+    
+    .how-to-play { background:#edf8ff; border:1px solid #cfe9fa; border-radius:13px; padding:20px 22px; margin:0 0 20px; }
+    .how-to-play h2 { margin:0 0 4px; color:#326e9c; }
+    .how-to-intro { color:var(--muted); margin:0 0 14px; font-size:.94rem; }
+    .how-to-steps { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+    .how-to-step { display:flex; align-items:flex-start; gap:10px; background:white; border:1px solid #d9ebf7; border-radius:10px; padding:13px; }
+    .how-to-step:nth-child(2) { background:#fff3f8; border-color:#f8dce9; }
+    .step-number { flex:0 0 auto; display:grid; place-items:center; width:30px; height:30px; border-radius:50%; background:#d9efff; color:#2879af; font-weight:700; font-size:.82rem; }
+    .how-to-step:nth-child(2) .step-number { background:#fbd8e8; color:#bf477a; }
+    .how-to-step h3 { margin:0 0 3px; color:var(--ink); }
+    .how-to-step p { margin:0; color:var(--muted); font-size:.85rem; line-height:1.45; }
+    @media (max-width:700px) { .how-to-steps { grid-template-columns:1fr; } }
+    .stats { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:13px; margin-bottom:20px; }
+    .stat { background:#eff8ff; border:1px solid #d9ecfb; border-radius:12px; padding:15px 18px; }
+    .stat:nth-child(2) { background:#fff0f6; border-color:#f9dce9; }
+    .stat span { display:block; color:var(--muted); font-size:.86rem; }
+    .stat strong { font-size:1.42rem; color:#307cae; }
+    .stat:nth-child(2) strong { color:#d8508d; }
+    .instrument { display:grid; grid-template-columns:300px minmax(0,1fr); gap:18px; align-items:start; }
+    .controls,.display,.panel { border:1px solid var(--line); border-radius:13px; background:#fff; padding:22px; }
+    .controls { background:#fffafd; border-color:#f6dfea; }
+    .display { min-width:0; }
+    .eyebrow { color:#d8518f; text-transform:uppercase; font-weight:700; letter-spacing:.07em; font-size:.8rem; }
+    .sensor-tag { display:inline-block; padding:5px 12px; border-radius:18px; background:#e5f4ff; color:#357db1; font-size:.85rem; font-weight:700; margin:11px 0; }
+    .intro,.subtle { color:var(--muted); }
+    .intro { margin:0 0 15px; }
+    .control-label { display:block; font-weight:700; font-size:.93rem; margin:15px 0 5px; }
+    input[type=number] { width:100%; padding:10px 12px; font:inherit; color:var(--ink); background:#fff; border:1px solid #c9ddec; border-radius:8px; }
+    input:focus-visible,button:focus-visible { outline:3px solid #8dcbed; outline-offset:2px; }
+    .btn { background:#e8f5ff; border:1px solid #cde5f7; color:#2b76a9; border-radius:8px; padding:10px 14px; font:700 .91rem var(--sans); cursor:pointer; transition:background .16s, transform .16s; }
+    .btn.primary { background:#ee75a6; color:#fff; border-color:#ee75a6; }
+    .btn:hover:not(:disabled) { background:#d6edff; transform:translateY(-1px); }
+    .btn.primary:hover:not(:disabled) { background:#df5a93; }
+    .btn:disabled { opacity:.5; cursor:not-allowed; }
+    .actions { display:flex; gap:9px; flex-wrap:wrap; margin-top:18px; }
+    .actions .btn { flex:1 1 auto; }
+    .hint { padding:12px 14px; margin-top:14px; border-left:4px solid #ee75a6; border-radius:7px; background:#fff0f6; font-size:.91rem; }
+    .plot { height:420px; width:100%; }
+    .plot-caption { color:var(--muted); font-size:.86rem; margin:8px 0 0; }
+    .panel { margin-top:20px; }
+    
+    .useful-methods { background:#fff0f6; border-color:#f7d7e7; }
+    .useful-methods h2 { color:#c64c83; }
+    .useful-methods .subtle { background:#ffffff; border:1px solid #f8dce9; border-radius:9px; padding:12px 15px; margin:10px 0; color:var(--ink); }
+    .useful-methods .subtle:last-child { margin-bottom:0; }
+    .result-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:13px; margin:15px 0; }
+    .result-card { background:#f2f9ff; border:1px solid var(--line); border-radius:10px; padding:14px; }
+    .result-card:nth-child(2) { background:#fff3f8; border-color:#f9e0ed; }
+    .result-card h3 { font:700 .98rem var(--sans); }
+    .result-card p { margin:5px 0; font-size:.9rem; }
+    .score { font-size:1.32rem; font-weight:700; color:var(--good); }
+    .status { color:var(--bad); font-size:.9rem; margin-top:8px; }
+    .score-explain { font-size:.88rem; color:var(--muted); }
+    .formula { padding:10px 12px; background:#eff8ff; border-radius:9px; overflow-x:auto; }
+    ol { padding-left:23px; }
+    li { margin:6px 0; }
+    footer { margin-top:32px; color:var(--muted); font-size:.84rem; text-align:center; }
+    @media (max-width:820px) {
+      .wrap { margin:16px; padding:20px; }
+      .instrument { grid-template-columns:1fr; }
+      .plot { height:350px; }
+    }
+    @media (max-width:540px) {
+      .wrap { margin:0; padding:17px 13px 32px; border-radius:0; }
+      .stats { grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
+      .stat:last-child { grid-column:1 / -1; }
+      .stat { padding:12px; }
+      .result-grid { grid-template-columns:1fr; }
+      .plot { height:310px; }
+      .controls,.display,.panel { padding:15px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <nav class="crumbs"><a href="index.html">Dynamics Toolkit</a> / Module 4</nav>
+    <h1>Guess the sensor</h1>
+    <p class="lede">An unknown sensor produced this response. Read the graph, estimate its dynamic parameters, then reveal how close you were.</p>
+
+    <section class="how-to-play" aria-labelledby="howToPlayTitle">
+      <h2 id="howToPlayTitle">How to Play</h2>
+      <p class="how-to-intro">Three easy steps to test your sensor knowledge:</p>
+      <div class="how-to-steps">
+        <div class="how-to-step">
+          <span class="step-number">01</span>
+          <div><h3>Observe</h3><p>Study the noisy response curve and the known input.</p></div>
+        </div>
+        <div class="how-to-step">
+          <span class="step-number">02</span>
+          <div><h3>Guess</h3><p>Estimate the hidden parameters. Use a hint if needed.</p></div>
+        </div>
+        <div class="how-to-step">
+          <span class="step-number">03</span>
+          <div><h3>Reveal</h3><p>Submit to compare curves and earn points. Try a new sensor!</p></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="stats" aria-live="polite">
+      <div class="stat"><span>Round</span><strong id="roundNumber">1</strong></div>
+      <div class="stat"><span>Session score</span><strong id="sessionScore">0 / 0</strong></div>
+      <div class="stat"><span>Average</span><strong id="sessionAverage">—</strong></div>
+    </div>
+
+    <div class="instrument">
+      <div class="controls">
+        <div class="eyebrow">Predict, then check</div>
+        <span class="sensor-tag" id="sensorTag">Generating sensor…</span>
+        <p class="intro" id="challengeText">Estimate the hidden parameters.</p>
+        <div id="inputInfo" class="formula" aria-live="polite"></div>
+        <form id="guessForm">
+          <div id="guessFields"></div>
+          <p id="formError" class="status" role="alert"></p>
+          <div class="actions">
+            <button class="btn primary" type="submit" id="submitGuess">Lock in my guess</button>
+            <button class="btn" type="button" id="hintButton">Show hint</button>
+          </div>
+        </form>
+        <p class="hint" id="hintText" hidden></p>
+        <p class="subtle" style="font-size:.85rem">The sensor parameters are hidden until you submit your guess (except ζ = 1 when the case is critically damped).</p>
+      </div>
+      <div class="display">
+        <h2>Measured response</h2>
+        <div id="responsePlot" class="plot" role="img" aria-label="Interactive noisy sensor response graph"></div>
+        <p class="plot-caption">Hover or tap the curve to inspect time and output. Noise is deliberately added to mimic measurements.</p>
+      </div>
+    </div>
+
+    <section class="panel" id="resultsPanel" hidden aria-live="polite">
+      <h2>Reveal: how close was your guess?</h2>
+      <p class="subtle">The graph now overlays your predicted curve (orange), the exact sensor response (blue), and the noisy measurement (pink).</p>
+      <div class="result-grid" id="parameterResults"></div>
+      <p class="score" id="roundScore"></p>
+      <p class="score-explain">Scoring rule: error ≤ 10% earns 100 points for that parameter. Beyond 10%, 2 points are subtracted for each additional percentage point (minimum 0). The round score averages the estimated parameter scores; for critical damping, ζ = 1 is known, so only ωₙ is scored.</p>
+      <div class="actions"><button type="button" class="btn primary" id="newSensor">New sensor →</button></div>
+    </section>
+
+
+    <section class="panel useful-methods" aria-labelledby="methodsTitle">
+      <h2 id="methodsTitle">Useful Methods</h2>
+      <p class="subtle"><strong>First-order step:</strong> steady value = K for a unit step; at t = τ, the output reaches 63.2% of that value.</p>
+      <p class="subtle"><strong>First-order sine:</strong> use the known input frequency, the output/input amplitude ratio, and the phase lag to estimate τ and K.</p>
+      <p class="subtle"><strong>Second-order underdamped step:</strong> overshoot identifies ζ; peak time helps identify ω<sub>n</sub>.</p>
+      <p class="subtle"><strong>Second-order critically damped step:</strong> ζ = 1; 26.4% of final output occurs at t = 1/ω<sub>n</sub>.</p>
+      <div class="subtle">
+        <strong>Second-order overdamped step:</strong> Read the times when the output reaches 50% and 90% of its final value (t<sub>50</sub>, t<sub>90</sub>). Calculate R = t<sub>90</sub> / t<sub>50</sub>, then compare it with these reference values for a normalized sensor (ω<sub>n</sub> = 1 rad/s):
+        <div style="overflow-x:auto;margin-top:8px">
+          <table style="width:100%;border-collapse:collapse;text-align:left;font-size:.88rem">
+            <thead><tr><th style="padding:5px 8px">ζ</th><th style="padding:5px 8px">R = t<sub>90</sub>/t<sub>50</sub></th><th style="padding:5px 8px">Normalized t<sub>50</sub> (s)</th></tr></thead>
+            <tbody>
+              <tr><td style="padding:5px 8px">1.2</td><td style="padding:5px 8px">2.62</td><td style="padding:5px 8px">1.88</td></tr>
+              <tr><td style="padding:5px 8px">1.5</td><td style="padding:5px 8px">2.90</td><td style="padding:5px 8px">2.23</td></tr>
+              <tr><td style="padding:5px 8px">2.0</td><td style="padding:5px 8px">3.10</td><td style="padding:5px 8px">2.87</td></tr>
+              <tr><td style="padding:5px 8px">2.2</td><td style="padding:5px 8px">3.14</td><td style="padding:5px 8px">3.13</td></tr>
+            </tbody>
+          </table>
+        </div>
+        Match R to estimate ζ. Then estimate ω<sub>n</sub> ≈ normalized t<sub>50</sub> / measured t<sub>50</sub>. Interpolate between rows if necessary. These are approximate estimates because of measurement noise.
+      </div>
+    </section>
+    <footer>ENCS4380 Interfacing Techniques · Dynamic Characteristics Toolkit · Module 4</footer>
+  </div>
+
+  <script>
+    "use strict";
+    (() => {
+      const $ = id => document.getElementById(id);
+      const rand = (min,max) => min + Math.random() * (max-min);
+      const fmt = (value,decimals=3) => Number(value).toFixed(decimals);
+      const css = token => getComputedStyle(document.documentElement).getPropertyValue(token).trim();
+      const MAX_ROUND_POINTS = 100;
+      let sensor, round = 1, totalPoints = 0, roundsPlayed = 0, revealed = false;
+
+      function stepFirst(t,p) {
+        return p.K * (1-Math.exp(-t/p.tau));
+      }
+      function sineFirst(t,p,omega) {
+        const magnitude = p.K / Math.sqrt(1+(omega*p.tau)**2);
+        const phase = -Math.atan(omega*p.tau);
+        return magnitude * Math.sin(omega*t+phase);
+      }
+      function dampingCase(zeta) {
+        return zeta < 1 ? 'Underdamped' : zeta === 1 ? 'Critically damped' : 'Overdamped';
+      }
+      function stepSecond(t,p) {
+        const z=p.zeta, w=p.wn;
+        if (Math.abs(z-1)<1e-10) return 1-(1+w*t)*Math.exp(-w*t);
+        if (z<1) {
+          const r=Math.sqrt(1-z*z), wd=w*r;
+          return 1-Math.exp(-z*w*t)*(Math.cos(wd*t)+(z/r)*Math.sin(wd*t));
+        }
+        const r=Math.sqrt(z*z-1);
+        const s1=-w*(z-r), s2=-w*(z+r);
+        return 1+(s2*Math.exp(s1*t)-s1*Math.exp(s2*t))/(s1-s2);
+      }
+      function secondOrderDuration(p) {
+        const z=p.zeta, w=p.wn;
+        if (z<1) return Math.max(2.2*Math.PI/(w*Math.sqrt(1-z*z)),7/(z*w));
+        if (z===1) return 9/w;
+        const slowPole=w*(z-Math.sqrt(z*z-1));
+        return 7/slowPole;
+      }
+      function response(t,p) {
+        if (sensor.kind === 'first-step') return stepFirst(t,p);
+        if (sensor.kind === 'first-sine') return sineFirst(t,p,sensor.omega);
+        return stepSecond(t,p);
+      }
+      function createSensor() {
+        const firstOrder = Math.random() < 0.5;
+        const kind = firstOrder
+          ? (Math.random() < 0.5 ? 'first-step' : 'first-sine')
+          : 'second-step';
+        let p;
+        if (kind === 'second-step') {
+          const cases=['under','critical','over'];
+          const damping=cases[Math.floor(Math.random()*cases.length)];
+          const zeta=damping==='under' ? +fmt(rand(.2,.75),3)
+            : damping==='critical' ? 1 : +fmt(rand(1.2,2.2),3);
+          p={zeta,wn:+fmt(rand(1.5,4),3)};
+        } else {
+          p={K:+fmt(rand(.8,2.2),3),tau:+fmt(rand(.4,2),3)};
+        }
+        const omega = kind === 'first-sine' ? +fmt(rand(1.0,3.0),3) : undefined;
+        const duration = kind === 'first-step' ? 7*p.tau
+          : kind === 'first-sine' ? 8*Math.PI/omega : secondOrderDuration(p);
+        const times=[], truth=[], measurements=[];
+        const noiseAmplitude = .015 * (kind === 'second-step' ? 1 : p.K);
+        for (let i=0;i<=450;i++) {
+          const t = duration*i/450;
+          const y = kind==='first-step' ? stepFirst(t,p)
+            : kind==='first-sine' ? sineFirst(t,p,omega) : stepSecond(t,p);
+          times.push(t); truth.push(y);
+          measurements.push(y + rand(-noiseAmplitude,noiseAmplitude));
+        }
+        return {kind,p,omega,times,truth,measurements};
+      }
+      function field(id,label,placeholder) {
+        return `<label class="control-label" for="${id}">${label}</label>
+          <input type="number" id="${id}" step="any" required placeholder="${placeholder}" autocomplete="off">`;
+      }
+      function setChallenge() {
+        const first = sensor.kind.startsWith('first');
+        const damping=first ? '' : dampingCase(sensor.p.zeta);
+        $('sensorTag').textContent = first ? 'First-order sensor' : `Second-order · ${damping}`;
+        $('challengeText').textContent = first
+          ? 'Estimate the static gain K and time constant τ.'
+          : sensor.p.zeta === 1
+            ? 'The critically damped case has ζ = 1. Estimate the natural frequency ωₙ.'
+            : 'Estimate the damping ratio ζ and natural frequency ωₙ.';
+        $('inputInfo').textContent = sensor.kind==='first-sine'
+          ? `Input: sin(ωt), amplitude 1, ω = ${fmt(sensor.omega,3)} rad/s. Output shown at steady state.`
+          : 'Input: unit step, amplitude = 1.';
+        $('guessFields').innerHTML = first
+          ? field('guessK','Gain K','e.g. 1.20')+field('guessTau','Time constant τ (s)','e.g. 0.80')
+          : sensor.p.zeta===1
+            ? `<p class="formula" style="margin:15px 0 0">Known from the damping case: ζ = 1</p>` +
+              field('guessWn','Natural frequency ωₙ (rad/s)','e.g. 2.00')
+            : field('guessZeta',sensor.p.zeta<1 ? 'Damping ratio ζ (0 < ζ < 1)' : 'Damping ratio ζ (> 1)',sensor.p.zeta<1 ? 'e.g. 0.50' : 'e.g. 1.50') +
+              field('guessWn','Natural frequency ωₙ (rad/s)','e.g. 2.00');
+      }
+      function makePlot(guess=null) {
+        const traces=[];
+        if (sensor.kind==='first-sine') {
+          traces.push({x:sensor.times,y:sensor.times.map(t=>Math.sin(sensor.omega*t)),
+            type:'scatter',mode:'lines',name:'Known input',
+            line:{color:css('--ghost'),width:1.6,dash:'dot'}});
+        }
+        traces.push({x:sensor.times,y:sensor.measurements,type:'scatter',mode:'lines',
+          name:'Noisy measurement',line:{color:css('--signal'),width:1.8}});
+        if (guess) {
+          traces.push({x:sensor.times,y:sensor.truth,type:'scatter',mode:'lines',
+            name:'True response',line:{color:css('--pole'),width:3}});
+          traces.push({x:sensor.times,y:sensor.times.map(t=>response(t,guess)),
+            type:'scatter',mode:'lines',name:'Your guessed response',
+            line:{color:css('--band'),width:2.6,dash:'dash'}});
+        }
+        Plotly.react('responsePlot',traces,{
+          margin:{l:56,r:14,t:44,b:50},
+          paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',
+          font:{family:'Instrument Sans,system-ui,sans-serif',color:css('--ink'),size:12},
+          xaxis:{title:{text:'Time t (s)'},gridcolor:css('--line'),zerolinecolor:css('--line')},
+          yaxis:{title:{text:'Output y(t)'},gridcolor:css('--line'),zerolinecolor:css('--line')},
+          legend:{orientation:'h',x:0,y:1.02,yanchor:'bottom',font:{size:10}},
+          hovermode:'closest',showlegend:true
+        },{responsive:true,displaylogo:false});
+      }
+      function showHint() {
+        let hint;
+        if (sensor.kind==='first-step') {
+          hint='Find the final output K. Locate 63.2% of that value; the corresponding time is τ. Alternatively, ln[(K − y)/K] has slope −1/τ.';
+        } else if (sensor.kind==='first-sine') {
+          hint='Measure the lag Δt between the input and output peaks. Phase magnitude φ = ωΔt, so τ = tan(φ)/ω. Then K = (output amplitude/input amplitude) × √[1+(ωτ)²].';
+        } else if (sensor.p.zeta<1) {
+          hint='Use overshoot fraction Mp = (peak − final value)/final value, then ζ = −ln(Mp)/√[π²+ln²(Mp)]. Peak time tp = π/[ωₙ√(1−ζ²)].';
+        } else if (sensor.p.zeta===1) {
+          hint='For critical damping, ζ = 1. The step response reaches about 26.4% of its final value at t = 1/ωₙ. Find that crossing time to estimate ωₙ ≈ 1/t.';
+        } else {
+          hint='Read t50 and t90 from the noisy response (times to reach 50% and 90% of the final value 1). Compute R = t90 / t50. Compare R with the Overdamped reference values in Useful Methods to estimate ζ; then estimate ωₙ ≈ normalized t50 / measured t50. Use hover for more accurate times.';
+        }
+        $('hintText').textContent=hint;
+        $('hintText').hidden=false;
+      }
+      function readGuess() {
+        if (sensor.kind.startsWith('first')) {
+          const ids=['guessK','guessTau'];
+          const values=ids.map(id=>$(id).value.trim()==='' ? NaN : Number($(id).value));
+          if (values.some(v=>!Number.isFinite(v)||v<=0)) throw new Error('Enter positive numbers for both parameters.');
+          return {K:values[0],tau:values[1]};
+        }
+        const wnInput=$('guessWn').value.trim();
+        const wn=wnInput==='' ? NaN : Number(wnInput);
+        if (!Number.isFinite(wn)||wn<=0) throw new Error('Enter a positive natural frequency.');
+        if (sensor.p.zeta===1) return {zeta:1,wn};
+        const zInput=$('guessZeta').value.trim();
+        const zeta=zInput==='' ? NaN : Number(zInput);
+        if (!Number.isFinite(zeta)||zeta<=0) throw new Error('Enter a positive damping ratio.');
+        if (sensor.p.zeta<1 && zeta>=1) throw new Error('This round is underdamped: use 0 < ζ < 1.');
+        if (sensor.p.zeta>1 && zeta<=1) throw new Error('This round is overdamped: use ζ > 1.');
+        return {zeta,wn};
+      }
+      function grade(estimated,actual) {
+        const error = Math.abs(estimated-actual)/actual*100;
+        return {error,points:error<=10 ? 100 : Math.max(0,100-2*(error-10))};
+      }
+      function reveal(guess) {
+        if (revealed) return;
+        const first=sensor.kind.startsWith('first');
+        const keys=first ? [['K','Gain K'],['tau','Time constant τ (s)']]
+          : sensor.p.zeta===1 ? [['wn','Natural frequency ωₙ (rad/s)']]
+          : [['zeta','Damping ratio ζ'],['wn','Natural frequency ωₙ (rad/s)']];
+        let sum=0;
+        $('parameterResults').innerHTML=keys.map(([key,label])=>{
+          const g=grade(guess[key],sensor.p[key]);
+          sum+=g.points;
+          return `<div class="result-card"><h3>${label}</h3>
+            <p>Your guess: <strong>${fmt(guess[key])}</strong></p>
+            <p>True value: <strong>${fmt(sensor.p[key])}</strong></p>
+            <p>Relative error: <strong>${fmt(g.error,1)}%</strong></p>
+            <p>Parameter score: <strong>${fmt(g.points,1)} / 100</strong></p></div>`;
+        }).join('');
+        const roundPoints=sum/keys.length;
+        totalPoints+=roundPoints; roundsPlayed++; revealed=true;
+        $('roundScore').textContent=`Round score: ${fmt(roundPoints,1)} / ${MAX_ROUND_POINTS}`;
+        $('sessionScore').textContent=`${fmt(totalPoints,1)} / ${roundsPlayed*MAX_ROUND_POINTS}`;
+        $('sessionAverage').textContent=`${fmt(totalPoints/roundsPlayed,1)}%`;
+        $('resultsPanel').hidden=false;
+        $('submitGuess').disabled=true;
+        $('hintButton').disabled=true;
+        for (const input of $('guessFields').querySelectorAll('input')) input.disabled=true;
+        makePlot(guess);
+        $('resultsPanel').scrollIntoView({behavior:'smooth',block:'nearest'});
+      }
+      function startRound() {
+        sensor=createSensor(); revealed=false;
+        $('roundNumber').textContent=String(round);
+        $('formError').textContent='';
+        $('hintText').hidden=true;
+        $('resultsPanel').hidden=true;
+        $('submitGuess').disabled=false;
+        $('hintButton').disabled=false;
+        setChallenge(); makePlot();
+      }
+      $('guessForm').addEventListener('submit',event=>{
+        event.preventDefault();
+        if (revealed) return;
+        try { $('formError').textContent=''; reveal(readGuess()); }
+        catch(error) { $('formError').textContent=error.message; }
+      });
+      $('hintButton').addEventListener('click',showHint);
+      $('newSensor').addEventListener('click',()=>{round++;startRound();window.scrollTo({top:0,behavior:'smooth'});});
+      startRound();
+    })();
+  </script>
+</body>
+</html>
