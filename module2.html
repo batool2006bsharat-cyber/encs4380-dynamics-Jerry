@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ENCS4380 Homework 1 - Module 2</title>
+
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+    <style>
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            margin: 0;
+            padding: 30px 12px;
+            color: #4a2740;
+            background: linear-gradient(160deg, #fff0f6, #f3e8ff);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background-color: white;
+            padding: 25px;
+            border-radius: 22px;
+            box-shadow: 0 10px 30px rgba(226, 84, 143, 0.18);
+        }
+
+        h1 {
+            color: #e2548f;
+            margin-top: 0;
+        }
+
+        h2 {
+            color: #8f6fdc;
+        }
+
+        h3 {
+            margin-top: 0;
+            color: #c13b74;
+        }
+
+        .control {
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="range"] {
+            width: 260px;
+            max-width: 60%;
+            accent-color: #e2548f;
+            vertical-align: middle;
+        }
+
+        .value {
+            font-weight: bold;
+            color: #e2548f;
+        }
+
+        #timePlot,
+        #magPlot,
+        #phasePlot {
+            width: 100%;
+            height: 420px;
+        }
+
+        .infoBox {
+            background-color: #f3e8ff;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 14px;
+            line-height: 1.8;
+        }
+
+        .predictBox {
+            background-color: #ffe9f2;
+            border: 2px dashed #f7b6d2;
+            padding: 15px;
+            margin-top: 25px;
+            border-radius: 14px;
+        }
+
+        .calcBox {
+            background-color: #fff3ea;
+            padding: 15px;
+            margin-top: 25px;
+            border-radius: 14px;
+        }
+
+        .validationBox {
+            background-color: #e9f8f2;
+            padding: 15px;
+            margin-top: 25px;
+            border-radius: 14px;
+        }
+
+        button {
+            padding: 8px 18px;
+            cursor: pointer;
+            margin-top: 10px;
+            border: none;
+            border-radius: 999px;
+            background-color: #e2548f;
+            color: white;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: #c13b74;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            padding: 7px;
+            border: 2px solid #f0d4e3;
+            border-radius: 10px;
+        }
+
+        input[type="text"] {
+            width: 300px;
+            max-width: 90%;
+        }
+
+        input[type="number"] {
+            width: 110px;
+        }
+
+        .tableWrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            border: 1px solid #f0d4e3;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #ffe3ef;
+        }
+
+        .pass {
+            color: #1d7a5f;
+            font-weight: bold;
+        }
+
+        .fail {
+            color: #b3263f;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Dynamic Characteristics Toolkit</h1>
+
+    <h2>Module 2: First-Order Frequency Response</h2>
+
+    <p>
+        Model: G(s) = 1 / (τs + 1),
+        M = 1 / √(1 + (ωτ)²),
+        φ = −tan⁻¹(ωτ)
+    </p>
+
+
+    <!-- Controls -->
+
+    <div class="control">
+        <label for="tauSlider">Time Constant τ:</label>
+        <input type="range" id="tauSlider" min="0.05" max="2" value="0.2" step="0.05">
+        <span class="value" id="tauValue">0.2</span> s
+    </div>
+
+    <div class="control">
+        <label for="wSlider">Input Frequency ω:</label>
+        <input type="range" id="wSlider" min="0.1" max="50" value="2" step="0.1">
+        <span class="value" id="wValue">2</span> rad/s
+    </div>
+
+
+    <!-- Predict then check -->
+
+    <div class="predictBox">
+
+        <h3>Predict, then check</h3>
+
+        <p>
+            Before changing τ or ω, predict what will happen to the output:
+            will it become smaller? Will it lag behind the input? By how much?
+        </p>
+
+        <input type="text" id="prediction" placeholder="Write your prediction here...">
+
+        <br>
+
+        <button onclick="checkPrediction()">Check Prediction</button>
+
+        <p id="predictionResult"></p>
+
+    </div>
+
+
+    <!-- Input and output sines on one plot -->
+
+    <div id="timePlot"></div>
+
+    <!-- Numbers for the current τ and ω -->
+
+    <div id="infoBox" class="infoBox"></div>
+
+
+    <!-- Bode plot -->
+
+    <h3 style="margin-top: 30px;">Bode Plot</h3>
+
+    <div id="magPlot"></div>
+    <div id="phasePlot"></div>
+
+
+    <!-- Dynamic-error calculator -->
+
+    <div class="calcBox">
+
+        <h3>Dynamic-Error Calculator</h3>
+
+        <p>
+            Error δ = M − 1. For a maximum error e,
+            τmax = √(1/(1−e)² − 1) / (2πf).
+        </p>
+
+        <label for="fmax">Highest signal frequency (Hz):</label>
+        <input type="number" id="fmax" value="100" min="0.001" step="any">
+        <br><br>
+
+        <label for="emax">Allowed dynamic error (%):</label>
+        <input type="number" id="emax" value="5" min="0.01" max="99" step="any">
+        <br><br>
+
+        <label for="fphase">Check phase lag at (Hz):</label>
+        <input type="number" id="fphase" value="50" min="0.001" step="any">
+
+        <p id="calcResult"></p>
+
+    </div>
+
+
+    <!-- Validation -->
+
+    <div class="validationBox">
+
+        <h3>Validation Checks</h3>
+
+        <div class="tableWrap">
+            <table>
+
+                <tr>
+                    <th>Test</th>
+                    <th>Expected Value</th>
+                    <th>Calculated Value</th>
+                    <th>Status</th>
+                </tr>
+
+                <tbody id="validationBody"></tbody>
+
+            </table>
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    /* ---------- Elements ---------- */
+
+    const tauSlider = document.getElementById("tauSlider");
+    const wSlider = document.getElementById("wSlider");
+    const tauValue = document.getElementById("tauValue");
+    const wValue = document.getElementById("wValue");
+
+    const RAD2DEG = 180 / Math.PI;
+
+    /* Colors (same palette as the CSS) */
+
+    const ROSE = "#e2548f";
+    const LILAC = "#8f6fdc";
+    const MINT = "#4fb89a";
+
+
+    /* ---------- Formulas ---------- */
+
+    // Amplitude ratio: M = 1 / sqrt(1 + (w*tau)^2)
+    function magnitude(w, tau) {
+        return 1 / Math.sqrt(1 + (w * tau) * (w * tau));
+    }
+
+    // Phase in degrees: phi = -atan(w*tau)
+    function phase(w, tau) {
+        return -Math.atan(w * tau) * RAD2DEG;
+    }
+
+    // Largest tau for a given frequency f (Hz) and error e (fraction)
+    // From M >= 1 - e  ->  w*tau <= sqrt(1/(1-e)^2 - 1)
+    function tauMax(f, e) {
+        return Math.sqrt(1 / ((1 - e) * (1 - e)) - 1) / (2 * Math.PI * f);
+    }
+
+
+    /* ---------- Shared plot style ---------- */
+
+    function makeLayout(title, xTitle, yTitle, extra) {
+        const layout = {
+            title: title,
+            xaxis: { title: xTitle, gridcolor: "#f5dce8" },
+            yaxis: { title: yTitle, gridcolor: "#f5dce8" },
+            paper_bgcolor: "rgba(0,0,0,0)",
+            plot_bgcolor: "#fffafc",
+            font: { color: "#4a2740" },
+            legend: { orientation: "h", y: -0.25 },
+            margin: { t: 50, r: 20, b: 60, l: 60 }
+        };
+
+        return Object.assign(layout, extra || {});
+    }
+
+
+    /* ---------- Main drawing function ---------- */
+
+    function drawPlot() {
+
+        const tau = parseFloat(tauSlider.value);
+        const w = parseFloat(wSlider.value);
+
+        const M = magnitude(w, tau);
+        const phi = phase(w, tau);          // degrees, negative
+        const wc = 1 / tau;                 // cutoff frequency
+        const delay = Math.abs(phi) / RAD2DEG / w;   // time lag in seconds
+
+
+        /* ----- 1) Input and output sines on one plot ----- */
+
+        const period = 2 * Math.PI / w;
+        const maxTime = 3 * period;         // show 3 periods
+        const numberOfPoints = 400;
+
+        let t = [];
+        let input = [];
+        let output = [];
+
+        for (let i = 0; i <= numberOfPoints; i++) {
+
+            const time = (i / numberOfPoints) * maxTime;
+
+            t.push(time);
+
+            // Input: x(t) = sin(wt)
+            input.push(Math.sin(w * time));
+
+            // Output: y(t) = M sin(wt + phi)
+            output.push(M * Math.sin(w * time + phi / RAD2DEG));
+        }
+
+        const inputTrace = {
+            x: t,
+            y: input,
+            mode: "lines",
+            name: "Input x(t)",
+            line: { color: LILAC, width: 2 }
+        };
+
+        const outputTrace = {
+            x: t,
+            y: output,
+            mode: "lines",
+            name: "Output y(t)",
+            line: { color: ROSE, width: 3 }
+        };
+
+        // Segment between the two zero crossings = time lag
+        const delayTrace = {
+            x: [0, delay],
+            y: [0, 0],
+            mode: "lines+markers",
+            name: "Time lag Δt = " + (delay * 1000).toFixed(1) + " ms",
+            line: { color: MINT, width: 3 },
+            marker: { size: 9 }
+        };
+
+        Plotly.newPlot(
+            "timePlot",
+            [inputTrace, outputTrace, delayTrace],
+            makeLayout(
+                "Input and Output Sine Waves",
+                "Time (s)",
+                "Amplitude",
+                { yaxis: { title: "Amplitude", range: [-1.2, 1.2], gridcolor: "#f5dce8" } }
+            ),
+            { responsive: true }
+        );
+
+
+        /* ----- 2) Information box ----- */
+
+        let comment;
+
+        if (w * tau < 0.1) {
+            comment = "ωτ is small: the sensor follows the input almost perfectly.";
+        } else if (w * tau < 0.9) {
+            comment = "The output is already smaller and delayed.";
+        } else if (w * tau < 1.1) {
+            comment = "You are at the cutoff: amplitude 70.7% and phase lag 45°.";
+        } else if (w * tau < 5) {
+            comment = "Past the cutoff: strong attenuation and a large lag.";
+        } else {
+            comment = "The sensor barely reacts to this fast input.";
+        }
+
+        document.getElementById("infoBox").innerHTML =
+            "<b>ωτ:</b> " + (w * tau).toFixed(3) +
+            "<br><b>Amplitude ratio M:</b> " + M.toFixed(3) +
+            " (" + (20 * Math.log10(M)).toFixed(2) + " dB)" +
+            "<br><b>Phase lag φ:</b> " + phi.toFixed(1) + "°" +
+            "<br><b>Dynamic error δ = M − 1:</b> " + ((M - 1) * 100).toFixed(1) + " %" +
+            "<br><b>Cutoff ω = 1/τ:</b> " + wc.toFixed(2) + " rad/s" +
+            "<br><br>" + comment;
+
+
+        /* ----- 3) Bode plots (ω from 0.01/τ to 100/τ) ----- */
+
+        const wMin = 0.01 * wc;
+        const wMax = 100 * wc;
+        const bodePoints = 200;
+
+        let wArray = [];
+        let magDb = [];
+        let phaseDeg = [];
+
+        for (let i = 0; i <= bodePoints; i++) {
+
+            // Evenly spaced on a log axis
+            const wi = wMin * Math.pow(wMax / wMin, i / bodePoints);
+
+            wArray.push(wi);
+            magDb.push(20 * Math.log10(magnitude(wi, tau)));
+            phaseDeg.push(phase(wi, tau));
+        }
+
+        // Keep the "your input" dot inside the plot
+        const wDot = Math.min(Math.max(w, wMin), wMax);
+
+        // --- Magnitude ---
+
+        const magTrace = {
+            x: wArray,
+            y: magDb,
+            mode: "lines",
+            name: "|G(jω)| (dB)",
+            line: { color: LILAC, width: 3 }
+        };
+
+        const magCutoff = {
+            x: [wc],
+            y: [-3.01],
+            mode: "markers+text",
+            name: "Cutoff ω = 1/τ",
+            text: ["−3 dB at ω = 1/τ"],
+            textposition: "bottom left",
+            marker: { size: 12, color: ROSE }
+        };
+
+        const magInput = {
+            x: [wDot],
+            y: [20 * Math.log10(magnitude(wDot, tau))],
+            mode: "markers",
+            name: "Your input ω",
+            marker: { size: 12, color: MINT, symbol: "diamond" }
+        };
+
+        Plotly.newPlot(
+            "magPlot",
+            [magTrace, magCutoff, magInput],
+            makeLayout(
+                "Bode Plot: Magnitude",
+                "ω (rad/s)",
+                "Magnitude (dB)",
+                {
+                    xaxis: { title: "ω (rad/s)", type: "log", dtick: 1, gridcolor: "#f5dce8" },
+                    yaxis: { title: "Magnitude (dB)", range: [-40, 5], gridcolor: "#f5dce8" }
+                }
+            ),
+            { responsive: true }
+        );
+
+        // --- Phase ---
+
+        const phaseTrace = {
+            x: wArray,
+            y: phaseDeg,
+            mode: "lines",
+            name: "φ (degrees)",
+            line: { color: LILAC, width: 3 }
+        };
+
+        const phaseCutoff = {
+            x: [wc],
+            y: [-45],
+            mode: "markers+text",
+            name: "Cutoff ω = 1/τ",
+            text: ["−45° at ω = 1/τ"],
+            textposition: "top right",
+            marker: { size: 12, color: ROSE }
+        };
+
+        const phaseInput = {
+            x: [wDot],
+            y: [phase(wDot, tau)],
+            mode: "markers",
+            name: "Your input ω",
+            marker: { size: 12, color: MINT, symbol: "diamond" }
+        };
+
+        Plotly.newPlot(
+            "phasePlot",
+            [phaseTrace, phaseCutoff, phaseInput],
+            makeLayout(
+                "Bode Plot: Phase",
+                "ω (rad/s)",
+                "Phase (degrees)",
+                {
+                    xaxis: { title: "ω (rad/s)", type: "log", dtick: 1, gridcolor: "#f5dce8" },
+                    yaxis: { title: "Phase (degrees)", range: [-100, 10], gridcolor: "#f5dce8" }
+                }
+            ),
+            { responsive: true }
+        );
+    }
+
+
+    /* ---------- Dynamic-error calculator ---------- */
+
+    function runCalculator() {
+
+        const f = parseFloat(document.getElementById("fmax").value);
+        const e = parseFloat(document.getElementById("emax").value) / 100;
+        const fp = parseFloat(document.getElementById("fphase").value);
+
+        const result = document.getElementById("calcResult");
+
+        if (!(f > 0) || !(e > 0 && e < 1) || !(fp > 0)) {
+            result.textContent = "Enter valid positive numbers (error between 0 and 100%).";
+            return;
+        }
+
+        const tau = tauMax(f, e);
+        const lag = -phase(2 * Math.PI * fp, tau);
+
+        result.innerHTML =
+            "<b>Largest allowed τ:</b> " + (tau * 1000).toFixed(3) + " ms" +
+            "<br><b>Phase lag at " + fp + " Hz:</b> " + lag.toFixed(1) + "°";
+    }
+
+
+    /* ---------- Validation (numbers from the lecture slides) ---------- */
+
+    function runValidation() {
+
+        const tau100 = tauMax(100, 0.05);
+
+        // [test, expected, calculated, tolerance, unit]
+        const tests = [
+            ["Amplitude ratio (τ = 0.2 s, input sin 2t)", 0.93, magnitude(2, 0.2), 0.005, ""],
+            ["Phase lag (τ = 0.2 s, input sin 2t)", 21.8, -phase(2, 0.2), 0.05, "°"],
+            ["τmax for 100 Hz with 5% error", 0.52, tau100 * 1000, 0.01, " ms"],
+            ["Phase lag at 50 Hz with that τmax", 9.3, -phase(2 * Math.PI * 50, tau100), 0.05, "°"]
+        ];
+
+        let rows = "";
+
+        for (const test of tests) {
+
+            const pass = Math.abs(test[1] - test[2]) <= test[3];
+
+            rows +=
+                "<tr>" +
+                "<td>" + test[0] + "</td>" +
+                "<td>≈ " + test[1] + test[4] + "</td>" +
+                "<td>" + test[2].toFixed(3) + test[4] + "</td>" +
+                "<td class='" + (pass ? "pass" : "fail") + "'>" +
+                (pass ? "PASS ✓" : "FAIL ✗") + "</td>" +
+                "</tr>";
+        }
+
+        document.getElementById("validationBody").innerHTML = rows;
+    }
+
+
+    /* ---------- Predict then check ---------- */
+
+    function checkPrediction() {
+
+        const prediction = document.getElementById("prediction").value;
+        const result = document.getElementById("predictionResult");
+
+        if (prediction.trim() === "") {
+            result.textContent = "Write a prediction first.";
+            return;
+        }
+
+        const tau = parseFloat(tauSlider.value);
+        const w = parseFloat(wSlider.value);
+
+        result.innerHTML =
+            "<b>Your prediction:</b> " + prediction +
+            "<br><br><b>The real values now:</b> M = " + magnitude(w, tau).toFixed(3) +
+            ", φ = " + phase(w, tau).toFixed(1) + "°" +
+            "<br><br>Now move τ or ω and compare your prediction with the plots.";
+    }
+
+
+    /* ---------- Events ---------- */
+
+    tauSlider.addEventListener("input", function () {
+        tauValue.textContent = tauSlider.value;
+        drawPlot();
+    });
+
+    wSlider.addEventListener("input", function () {
+        wValue.textContent = wSlider.value;
+        drawPlot();
+    });
+
+    ["fmax", "emax", "fphase"].forEach(function (id) {
+        document.getElementById(id).addEventListener("input", runCalculator);
+    });
+
+
+    /* ---------- Initial draw ---------- */
+
+    drawPlot();
+    runCalculator();
+    runValidation();
+
+</script>
+
+</body>
+
+</html>
