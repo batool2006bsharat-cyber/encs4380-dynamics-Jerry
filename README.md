@@ -15,7 +15,7 @@ Works on desktop and phone. No server, login or installation needed.
 
 | Member | Student ID | Module | GitHub Issue |
 |---|---|---|---|
-|  Batool Bsharat |  | Module 1: First-order time response | #1 |
+|  Batool Bsharat | 1230049 | Module 1: First-order time response | #1 |
 |  Hala Qunir     | 1231745 | Module 2: First-order frequency response | #2 |
 |  Basamat Yasin  |  | Module 3: Second-order response | #3 |
 |  Niveen Antari  | 1232976 | Module 4: Guess the sensor | #4 |
