@@ -5,15 +5,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>ENCS4380 Homework 1 - Module 1</title>
-
-    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+    <title>Dynamic Characteristics Toolkit | ENCS4380</title>
 
     <style>
+        /* ---------- Shared toolkit design (Module 2 style) ---------- */
+        * { box-sizing: border-box; }
+
         body {
-            font-family: Arial, sans-serif;
-            margin: 30px;
-            background-color: #f7f7f7;
+            font-family: "Segoe UI", Arial, sans-serif;
+            margin: 0;
+            padding: 30px 12px;
+            color: #4a2740;
+            background: linear-gradient(160deg, #fff0f6, #f3e8ff);
+            min-height: 100vh;
         }
 
         .container {
@@ -21,54 +25,97 @@
             margin: auto;
             background-color: white;
             padding: 25px;
-            border-radius: 10px;
+            border-radius: 22px;
+            box-shadow: 0 10px 30px rgba(226, 84, 143, 0.18);
         }
 
-        .control {
-            margin-bottom: 20px;
+        h1 { color: #e2548f; margin-top: 0; }
+        h2 { color: #8f6fdc; }
+        h3 { margin-top: 0; color: #c13b74; }
+
+        a { color: #c13b74; }
+
+        .crumbs {
+            font-size: 0.9rem;
+            color: #8a6a80;
+            margin: 0 0 8px;
         }
 
-        label {
+        .control { margin-bottom: 20px; }
+
+        label { font-weight: bold; }
+
+        input[type="range"] {
+            width: 260px;
+            max-width: 60%;
+            accent-color: #e2548f;
+            vertical-align: middle;
+        }
+
+        .value {
             font-weight: bold;
-        }
-
-        #responsePlot,
-        #errorPlot {
-            width: 100%;
-            height: 500px;
+            color: #e2548f;
         }
 
         .infoBox {
-            background-color: #f0f0f0;
+            background-color: #f3e8ff;
             padding: 15px;
             margin-top: 15px;
-            border-radius: 8px;
+            border-radius: 14px;
+            line-height: 1.8;
         }
 
         .predictBox {
-            background-color: #fff7dd;
+            background-color: #ffe9f2;
+            border: 2px dashed #f7b6d2;
             padding: 15px;
             margin-top: 25px;
-            border-radius: 8px;
+            border-radius: 14px;
+        }
+
+        .calcBox {
+            background-color: #fff3ea;
+            padding: 15px;
+            margin-top: 25px;
+            border-radius: 14px;
         }
 
         .validationBox {
-            background-color: #eef7ee;
+            background-color: #e9f8f2;
             padding: 15px;
             margin-top: 25px;
-            border-radius: 8px;
+            border-radius: 14px;
         }
 
         button {
-            padding: 8px 15px;
+            padding: 8px 18px;
             cursor: pointer;
             margin-top: 10px;
+            border: none;
+            border-radius: 999px;
+            background-color: #e2548f;
+            color: white;
+            font-weight: bold;
+            font-family: inherit;
         }
 
-        input[type="text"] {
+        button:hover { background-color: #c13b74; }
+
+        input[type="text"],
+        input[type="number"],
+        select {
             padding: 7px;
-            width: 300px;
+            border: 2px solid #f0d4e3;
+            border-radius: 10px;
+            font-family: inherit;
+            color: #4a2740;
+            background: white;
         }
+
+        input[type="text"] { width: 300px; max-width: 90%; }
+        input[type="number"] { width: 110px; }
+
+        .tableWrap { overflow-x: auto; }
 
         table {
             width: 100%;
@@ -76,18 +123,50 @@
             margin-top: 10px;
         }
 
-        th,
-        td {
-            border: 1px solid #aaa;
+        th, td {
+            border: 1px solid #f0d4e3;
             padding: 10px;
             text-align: center;
         }
 
-        th {
-            background-color: #eeeeee;
-        }
-    </style>
+        th { background-color: #ffe3ef; }
 
+        .pass { color: #1d7a5f; font-weight: bold; }
+        .fail { color: #b3263f; font-weight: bold; }
+
+        footer {
+            margin-top: 30px;
+            font-size: 0.85rem;
+            color: #8a6a80;
+            text-align: center;
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 0; }
+            .container { border-radius: 0; padding: 16px; }
+            input[type="range"] { width: 100%; max-width: 100%; }
+        }
+
+        /* ---------- Home page ---------- */
+        .lede { max-width: 66ch; color: #8a6a80; font-size: 1.05rem; line-height: 1.6; }
+        .cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+        @media (max-width: 700px) { .cards { grid-template-columns: 1fr; } }
+        .card {
+            display: flex; flex-direction: column; gap: 6px; text-decoration: none; color: #4a2740;
+            background: var(--bg); border-radius: 18px; padding: 18px;
+            transition: transform .15s, box-shadow .15s;
+        }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(226, 84, 143, 0.18); }
+        .card .num { font-size: .8rem; font-weight: bold; letter-spacing: .06em; color: var(--c); }
+        .card h3 { margin: 0; color: #4a2740; font-size: 1.2rem; }
+        .card p { margin: 0; color: #8a6a80; font-size: .94rem; }
+        .card .go {
+            align-self: flex-start; margin-top: auto; padding: 6px 16px; border-radius: 999px;
+            background: var(--c); color: white; font-weight: bold; font-size: .9rem;
+        }
+        .validationBox p { margin: 0 0 4px; color: #4a5a52; font-size: .92rem; }
+        @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+    </style>
 </head>
 
 <body>
@@ -96,108 +175,45 @@
 
     <h1>Dynamic Characteristics Toolkit</h1>
 
-    <h2>Module 1: First-Order Time Response</h2>
+    <h2>ENCS4380 Interfacing Techniques · Homework 1</h2>
 
-    <p>
-        Model:
-        τdy/dt + y = Kx
+    <p class="lede">
+        A sensor never reports the present. It reports the past, smoothed.
+        These four interactive modules show how τ, ζ and ω<sub>n</sub> decide how far behind a sensor is,
+        and then ask you to read those parameters off a curve you have never seen.
     </p>
 
-    <div class="control">
 
-        <label for="kSlider">Gain K:</label>
+    <!-- Modules -->
 
-        <input
-            type="range"
-            id="kSlider"
-            min="1"
-            max="10"
-            value="1"
-            step="1">
+    <h3 style="margin-top: 28px;">Modules</h3>
 
-        <span id="kValue">1</span>
-
+    <div class="cards">
+        <a class="card" href="module1.html" style="--c:#e2548f; --bg:#ffe9f2">
+            <span class="num">MODULE 1</span>
+            <h3>First-order time response</h3>
+            <p>A thermometer: τẏ + y = Kx. Step and ramp inputs, the 63.2% and 95% points, ramp lag and the log error-fraction plot.</p>
+            <span class="go">Open module →</span>
+        </a>
+        <a class="card" href="module2.html" style="--c:#8f6fdc; --bg:#f3e8ff">
+            <span class="num">MODULE 2</span>
+            <h3>First-order frequency response</h3>
+            <p>Input and output sines on one plot, amplitude ratio and phase lag, the Bode plot with its cutoff at ω = 1/τ, and a dynamic-error calculator.</p>
+            <span class="go">Open module →</span>
+        </a>
+        <a class="card" href="module3.html" style="--c:#4fb89a; --bg:#e9f8f2">
+            <span class="num">MODULE 3</span>
+            <h3>Second-order response</h3>
+            <p>An accelerometer or spring: under, critical and overdamped steps, metrics read off the curve, poles, state-space model and phase plane.</p>
+            <span class="go">Open module →</span>
+        </a>
+        <a class="card" href="module4.html" style="--c:#e08a4f; --bg:#fff3ea">
+            <span class="num">MODULE 4</span>
+            <h3>Guess the sensor</h3>
+            <p>A hidden random sensor produces a noisy response. Estimate τ, or ζ and ω<sub>n</sub>, then reveal the truth and score your guess.</p>
+            <span class="go">Play →</span>
+        </a>
     </div>
-
-
-    <div class="control">
-
-        <label for="tauSlider">Time Constant τ:</label>
-
-        <input
-            type="range"
-            id="tauSlider"
-            min="1"
-            max="10"
-            value="2"
-            step="1">
-
-        <span id="tauValue">2</span> s
-
-    </div>
-
-
-    <div class="control">
-
-        <label for="inputType">Input Type:</label>
-
-        <select id="inputType">
-
-            <option value="step">Step</option>
-
-            <option value="ramp">Ramp</option>
-
-        </select>
-
-    </div>
-
-
-    <!-- Predict then check -->
-
-    <div class="predictBox">
-
-        <h3>Predict, then check</h3>
-
-        <p>
-            Before changing K or τ, predict what will happen to the response.
-        </p>
-
-        <input
-            type="text"
-            id="prediction"
-            placeholder="Write your prediction here...">
-
-        <br>
-
-        <button onclick="checkPrediction()">
-            Check Prediction
-        </button>
-
-        <p id="predictionResult"></p>
-
-    </div>
-
-
-    <!-- Main response plot -->
-
-    <div id="responsePlot"></div>
-
-
-    <!-- Ramp information -->
-
-    <div
-        id="rampInfo"
-        class="infoBox">
-    </div>
-
-
-    <!-- Error fraction -->
-
-    <h3 id="errorTitle">
-        Error-Fraction Plot
-    </h3>
-
-    <div id="errorPlot"></div>
 
 
     <!-- Validation -->
@@ -206,715 +222,106 @@
 
         <h3>Validation Checks</h3>
 
-        <table>
+        <p>All six tests from the homework, recomputed by this page every time it loads. Each module also shows its own tests.</p>
 
-            <tr>
-                <th>Test</th>
-                <th>Expected Value</th>
-                <th>Calculated Value</th>
-                <th>Status</th>
-            </tr>
-
-            <tr>
-
-                <td>y(τ) / K</td>
-
-                <td>0.632</td>
-
-                <td id="validationTau"></td>
-
-                <td id="statusTau"></td>
-
-            </tr>
-
-            <tr>
-
-                <td>y(3τ) / K</td>
-
-                <td>0.950</td>
-
-                <td id="validation3Tau"></td>
-
-                <td id="status3Tau"></td>
-
-            </tr>
-
-        </table>
+        <div class="tableWrap">
+            <table>
+                <thead>
+                    <tr><th>Test</th><th>Expected Value</th><th>Calculated Value</th><th>Status</th><th>Module</th></tr>
+                </thead>
+                <tbody id="valBody"></tbody>
+            </table>
+        </div>
 
     </div>
 
+    <footer>
+        ENCS4380 Interfacing Techniques, Birzeit University · Instructor: Dr. Wasel Ghanem.
+        Team, module owners and AI-use notes are in the project README.
+    </footer>
+
 </div>
 
-
 <script>
-
-    const kSlider =
-        document.getElementById("kSlider");
-
-    const tauSlider =
-        document.getElementById("tauSlider");
-
-    const inputType =
-        document.getElementById("inputType");
-
-    const kValue =
-        document.getElementById("kValue");
-
-    const tauValue =
-        document.getElementById("tauValue");
-
-
-    function drawPlot() {
-
-        const K =
-            parseFloat(kSlider.value);
-
-        const tau =
-            parseFloat(tauSlider.value);
-
-
-        let t = [];
-
-        let y = [];
-
-        let input = [];
-
-        let errorFraction = [];
-
-
-        /*
-            Generate points from
-            t = 0 to t = 10τ.
-
-            This guarantees that
-            τ and 3τ are visible.
-        */
-
-        const maxTime = 10 * tau;
-
-        const numberOfPoints = 300;
-
-
-        for (
-            let i = 0;
-            i <= numberOfPoints;
-            i++
-        ) {
-
-            const time =
-                (i / numberOfPoints) * maxTime;
-
-            t.push(time);
-
-
-            if (
-                inputType.value === "step"
-            ) {
-
-                /*
-                    Step response:
-
-                    y(t) =
-                    K(1 - e^(-t/τ))
-
-                    Unit step amplitude A = 1
-                */
-
-                const output =
-                    K *
-                    (
-                        1 -
-                        Math.exp(-time / tau)
-                    );
-
-                y.push(output);
-
-                input.push(K);
-
-
-                /*
-                    Error fraction:
-
-                    (K - y) / K
-                    = e^(-t/τ)
-                */
-
-                const error =
-                    Math.exp(-time / tau);
-
-                errorFraction.push(error);
-
-            }
-
-            else {
-
-                /*
-                    Ramp response:
-
-                    x(t) = t
-
-                    y(t) =
-                    K[
-                        t - τ
-                        + τe^(-t/τ)
-                    ]
-                */
-
-                const output =
-                    K *
-                    (
-                        time
-                        - tau
-                        + tau *
-                        Math.exp(-time / tau)
-                    );
-
-                y.push(output);
-
-                input.push(K * time);
-
-            }
-        }
-
-
-        /*
-            OUTPUT RESPONSE
-        */
-
-        const outputTrace = {
-
-            x: t,
-
-            y: y,
-
-            mode: "lines",
-
-            name: "Output y(t)"
-
-        };
-
-
-        let traces = [];
-
-
-        /*
-            STEP
-        */
-
-        if (
-            inputType.value === "step"
-        ) {
-
-            const inputTrace = {
-
-                x: t,
-
-                y: input,
-
-                mode: "lines",
-
-                name: "Final Value KA"
-
-            };
-
-
-            /*
-                Important points
-            */
-
-            const yTau =
-                K *
-                (
-                    1 -
-                    Math.exp(-1)
-                );
-
-
-            const y3Tau =
-                K *
-                (
-                    1 -
-                    Math.exp(-3)
-                );
-
-
-            const markerTrace = {
-
-                x: [
-                    tau,
-                    3 * tau
-                ],
-
-                y: [
-                    yTau,
-                    y3Tau
-                ],
-
-                mode:
-                    "markers+text",
-
-                name:
-                    "Important Points",
-
-                text: [
-
-                    "63.2% at t = τ",
-
-                    "95% at t = 3τ"
-
-                ],
-
-                textposition:
-                    "top center",
-
-                marker: {
-                    size: 11
-                }
-
-            };
-
-
-            traces = [
-
-                inputTrace,
-
-                outputTrace,
-
-                markerTrace
-
-            ];
-
-
-            document
-                .getElementById(
-                    "rampInfo"
-                )
-                .innerHTML = "";
-
-
-            document
-                .getElementById(
-                    "errorTitle"
-                )
-                .style.display =
-                "block";
-
-
-            document
-                .getElementById(
-                    "errorPlot"
-                )
-                .style.display =
-                "block";
-
-
-            /*
-                Error-fraction plot
-            */
-
-            const errorTrace = {
-
-                x: t,
-
-                y: errorFraction,
-
-                mode: "lines",
-
-                name:
-                    "Error Fraction"
-
-            };
-
-
-            const errorLayout = {
-
-                title:
-                    "Error Fraction vs Time",
-
-                xaxis: {
-
-                    title:
-                        "Time (s)"
-
-                },
-
-                yaxis: {
-
-                    title:
-                        "(KA - y) / KA",
-
-                    type: "log"
-
-                },
-
-                annotations: [
-
-                    {
-
-                        x:
-                            5 * tau,
-
-                        y:
-                            Math.exp(-5),
-
-                        text:
-                            "Slope = -1/τ = " +
-                            (
-                                -1 / tau
-                            ).toFixed(3),
-
-                        showarrow:
-                            false
-
-                    }
-
-                ]
-
-            };
-
-
-            Plotly.newPlot(
-
-                "errorPlot",
-
-                [errorTrace],
-
-                errorLayout
-
-            );
-
-        }
-
-
-        /*
-            RAMP
-        */
-
-        else {
-
-            const inputTrace = {
-
-                x: t,
-
-                y: input,
-
-                mode: "lines",
-
-                name:
-                    "Input Ramp Kx(t)"
-
-            };
-
-
-            traces = [
-
-                inputTrace,
-
-                outputTrace
-
-            ];
-
-
-            /*
-                Ramp lag and
-                steady-state error
-            */
-
-            const steadyStateError =
-                K * tau;
-
-
-            document
-                .getElementById(
-                    "rampInfo"
-                )
-                .innerHTML =
-
-                "<b>Ramp Lag:</b> τ = "
-                + tau
-                + " s"
-
-                + "<br><br>"
-
-                + "<b>Steady-State Error:</b> "
-                + "Kτ = "
-                + steadyStateError
-                    .toFixed(2);
-
-
-            /*
-                Hide error plot
-                for ramp.
-            */
-
-            document
-                .getElementById(
-                    "errorTitle"
-                )
-                .style.display =
-                "none";
-
-
-            document
-                .getElementById(
-                    "errorPlot"
-                )
-                .style.display =
-                "none";
-
-        }
-
-
-        /*
-            Main plot
-        */
-
-        const layout = {
-
-            title:
-
-                inputType.value === "step"
-
-                ? "First-Order Step Response"
-
-                : "First-Order Ramp Response",
-
-
-            xaxis: {
-
-                title:
-                    "Time (s)"
-
-            },
-
-
-            yaxis: {
-
-                title:
-                    "Amplitude"
-
-            }
-
-        };
-
-
-        Plotly.newPlot(
-
-            "responsePlot",
-
-            traces,
-
-            layout
-
-        );
-
-
-        /*
-            Validation
-        */
-
-        runValidation(
-            K,
-            tau
-        );
-
-    }
-
-
-    function runValidation(
-        K,
-        tau
-    ) {
-
-        /*
-            Expected:
-            y(τ) = 0.632 KA
-        */
-
-        const yTau =
-            K *
-            (
-                1 -
-                Math.exp(-1)
-            );
-
-
-        const ratioTau =
-            yTau / K;
-
-
-        /*
-            Expected:
-            y(3τ) = 0.95 KA
-        */
-
-        const y3Tau =
-            K *
-            (
-                1 -
-                Math.exp(-3)
-            );
-
-
-        const ratio3Tau =
-            y3Tau / K;
-
-
-        document
-            .getElementById(
-                "validationTau"
-            )
-            .textContent =
-            ratioTau.toFixed(3);
-
-
-        document
-            .getElementById(
-                "validation3Tau"
-            )
-            .textContent =
-            ratio3Tau.toFixed(3);
-
-
-        /*
-            PASS / FAIL
-        */
-
-        document
-            .getElementById(
-                "statusTau"
-            )
-            .textContent =
-
-            Math.abs(
-                ratioTau - 0.632
-            ) < 0.005
-
-            ? "PASS ✓"
-
-            : "FAIL ✗";
-
-
-        document
-            .getElementById(
-                "status3Tau"
-            )
-            .textContent =
-
-            Math.abs(
-                ratio3Tau - 0.95
-            ) < 0.005
-
-            ? "PASS ✓"
-
-            : "FAIL ✗";
-
-    }
-
-
-    /*
-        Predict then check
-    */
-
-    function checkPrediction() {
-
-        const prediction =
-            document
-            .getElementById(
-                "prediction"
-            )
-            .value;
-
-
-        const result =
-            document
-            .getElementById(
-                "predictionResult"
-            );
-
-
-        if (
-            prediction.trim() === ""
-        ) {
-
-            result.textContent =
-                "Write a prediction first.";
-
-        }
-
-        else {
-
-            result.innerHTML =
-
-                "<b>Your prediction:</b> "
-                + prediction
-
-                + "<br><br>"
-
-                + "Now move K or τ "
-                + "and compare your prediction "
-                + "with the plots.";
-
-        }
-
-    }
-
-
-    /*
-        Slider events
-    */
-
-    kSlider.addEventListener(
-
-        "input",
-
-        function () {
-
-            kValue.textContent =
-                kSlider.value;
-
-            drawPlot();
-
-        }
-
-    );
-
-
-    tauSlider.addEventListener(
-
-        "input",
-
-        function () {
-
-            tauValue.textContent =
-                tauSlider.value;
-
-            drawPlot();
-
-        }
-
-    );
-
-
-    inputType.addEventListener(
-
-        "change",
-
-        function () {
-
-            drawPlot();
-
-        }
-
-    );
-
-
-    /*
-        Initial plot
-    */
-
-    drawPlot();
-
+"use strict";
+const fmt = (v, d = 3) => v.toFixed(d).replace("-", "−");
+
+/* Test 1: first-order step y(t) = K(1 - e^(-t/τ)), read off a sampled curve */
+function firstStep(t, K, tau){ return K * (1 - Math.exp(-t / tau)); }
+function sampleAt(fn, tEnd, N, tq){
+  const h = tEnd / N;
+  const i = Math.floor(tq / h), t0 = i * h;
+  const y0 = fn(t0), y1 = fn(t0 + h);
+  return y0 + (y1 - y0) * (tq - t0) / h;
+}
+
+/* Test 2 and 3: first-order frequency response */
+const mag = (w, tau) => 1 / Math.sqrt(1 + (w * tau) ** 2);
+const lagDeg = (w, tau) => Math.atan(w * tau) * 180 / Math.PI;
+const tauMax = (f, e) => Math.sqrt(1 / (1 - e) ** 2 - 1) / (2 * Math.PI * f);
+
+/* Test 4 and 5: second-order unit step, overshoot read off a sampled curve */
+function step2(t, z, wn){
+  if (Math.abs(z - 1) < 1e-9) return 1 - (1 + wn * t) * Math.exp(-wn * t);
+  const s = Math.sqrt(1 - z * z), wd = wn * s;
+  return 1 - Math.exp(-z * wn * t) / s * Math.sin(wd * t + Math.acos(z));
+}
+function overshoot(z, wn){
+  const tEnd = 10 / (z * wn), N = 20000;
+  let yMax = 0;
+  for (let i = 0; i <= N; i++) yMax = Math.max(yMax, step2(tEnd * i / N, z, wn));
+  return Math.max(0, (yMax - 1) * 100);
+}
+
+/* Test 6: eigenvalues of A from trace and determinant */
+function eig2(A){
+  const tr = A[0][0] + A[1][1], det = A[0][0] * A[1][1] - A[0][1] * A[1][0];
+  const disc = tr * tr / 4 - det;
+  if (disc >= 0){ const q = Math.sqrt(disc); return [{re:tr/2+q, im:0}, {re:tr/2-q, im:0}]; }
+  const q = Math.sqrt(-disc); return [{re:tr/2, im:q}, {re:tr/2, im:-q}];
+}
+const cplx = q => Math.abs(q.im) < 1e-12 ? fmt(q.re) : `${fmt(q.re)} ${q.im >= 0 ? "+" : "−"} j${fmt(Math.abs(q.im))}`;
+
+const rows = [];
+{
+  const K = 1, tau = 2, f = t => firstStep(t, K, tau);
+  const a = sampleAt(f, 10 * tau, 300, tau) / K, b = sampleAt(f, 10 * tau, 300, 3 * tau) / K;
+  rows.push(["1. First-order step: y(τ)/KA and y(3τ)/KA", "0.632 and 0.950",
+             `${fmt(a)} and ${fmt(b)}`, Math.abs(a - 0.632) < 0.005 && Math.abs(b - 0.95) < 0.005, 1]);
+}
+{
+  const M = mag(2, 0.2), p = lagDeg(2, 0.2);
+  rows.push(["2. τ = 0.2 s, input sin 2t: amplitude ratio and lag", "0.93 and 21.8°",
+             `${fmt(M)} and ${fmt(p, 1)}°`, Math.abs(M - 0.93) < 0.005 && Math.abs(p - 21.8) < 0.05, 2]);
+}
+{
+  const tm = tauMax(100, 0.05), p = lagDeg(2 * Math.PI * 50, tm);
+  rows.push(["3. 100 Hz, 5% dynamic error: τ<sub>max</sub> and lag at 50 Hz", "≈ 0.52 ms and 9.3°",
+             `${fmt(tm * 1000)} ms and ${fmt(p, 1)}°`, Math.abs(tm * 1000 - 0.52) < 0.01 && Math.abs(p - 9.3) < 0.05, 2]);
+}
+{
+  const os = overshoot(0.5, 2);
+  rows.push(["4. Second order, ζ = 0.5: overshoot", "16.3 %", `${fmt(os, 2)} %`, Math.abs(os - 16.3) < 0.1, 3]);
+}
+{
+  const os = overshoot(1, 2);
+  rows.push(["5. Second order, ζ = 1: overshoot", "0 % (none)", `${fmt(os, 4)} %`, os < 1e-3, 3]);
+}
+{
+  const m = 1, b = 2, k = 4, A = [[0, 1], [-k / m, -b / m]];
+  const e = eig2(A).sort((p, q) => q.im - p.im);
+  const z = b / (2 * Math.sqrt(m * k)), wn = Math.sqrt(k / m), wd = wn * Math.sqrt(1 - z * z);
+  const poles = [{re:-z * wn, im:wd}, {re:-z * wn, im:-wd}];
+  const ok = e.every((q, i) => Math.hypot(q.re - poles[i].re, q.im - poles[i].im) < 1e-9)
+          && Math.abs(e[0].re + 1) < 1e-3 && Math.abs(e[0].im - Math.sqrt(3)) < 1e-3;
+  rows.push(["6. State space, m = 1, b = 2, k = 4", "eig(A) = −1 ± j1.732, equal to the poles",
+             `eig(A) = ${e.map(cplx).join(", ")}<br>poles = ${poles.map(cplx).join(", ")}`, ok, 3]);
+}
+
+document.getElementById("valBody").innerHTML = rows.map(([name, exp, got, pass, mod]) => `
+  <tr><td>${name}</td><td>${exp}</td><td class="num">${got}</td>
+  <td class="${pass ? "pass" : "fail"}">${pass ? "PASS ✓" : "FAIL ✗"}</td>
+  <td><a href="module${mod}.html">Module ${mod}</a></td></tr>`).join("");
 </script>
 
 </body>
