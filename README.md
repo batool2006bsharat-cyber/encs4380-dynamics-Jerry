@@ -7,7 +7,7 @@ An interactive web toolkit that shows how a sensor's dynamic characteristics (τ
 
 ## 🔗 Live site
 
-**https://github.com/batool2006bsharat-cyber/encs4380-dynamics-Jerry/**
+**https://batool2006bsharat-cyber.github.io/encs4380-dynamics-Jerry/**
 
 Works on desktop and phone. No server, login or installation needed.
 
@@ -103,4 +103,13 @@ Module 3 includes an RK4 solver for ẋ = Ax + BF. The "Overlay RK4 simulation" 
 
 ## 🤖 AI use
 
-AI coding assistants were allowed for this homework. We used them for:
+AI coding assistants were used as development support during this homework.
+
+They were used to:
+- Help structure and organize the HTML, CSS, and JavaScript code.
+- Assist with debugging interactive controls, plots, and responsive layouts.
+- Support the implementation and checking of numerical calculations and validation tests.
+- Help improve code readability, organization, and user-interface consistency.
+- Review the implementation against the homework requirements.
+
+All mathematical models, equations, expected validation values, and final results were checked against the ENCS4380 course material. The team reviewed the final implementation and is prepared to explain the code, equations, plots, and design decisions during the demo.
