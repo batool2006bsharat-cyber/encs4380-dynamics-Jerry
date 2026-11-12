@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ENCS4380 Homework 1 - Module 1</title>
+
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+    <style>
+        /* ---------- Shared toolkit design (Module 2 style) ---------- */
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            margin: 0;
+            padding: 30px 12px;
+            color: #4a2740;
+            background: linear-gradient(160deg, #fff0f6, #f3e8ff);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background-color: white;
+            padding: 25px;
+            border-radius: 22px;
+            box-shadow: 0 10px 30px rgba(226, 84, 143, 0.18);
+        }
+
+        h1 { color: #e2548f; margin-top: 0; }
+        h2 { color: #8f6fdc; }
+        h3 { margin-top: 0; color: #c13b74; }
+
+        a { color: #c13b74; }
+
+        .crumbs {
+            font-size: 0.9rem;
+            color: #8a6a80;
+            margin: 0 0 8px;
+        }
+
+        .control { margin-bottom: 20px; }
+
+        label { font-weight: bold; }
+
+        input[type="range"] {
+            width: 260px;
+            max-width: 60%;
+            accent-color: #e2548f;
+            vertical-align: middle;
+        }
+
+        .value {
+            font-weight: bold;
+            color: #e2548f;
+        }
+
+        .infoBox {
+            background-color: #f3e8ff;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 14px;
+            line-height: 1.8;
+        }
+
+        .predictBox {
+            background-color: #ffe9f2;
+            border: 2px dashed #f7b6d2;
+            padding: 15px;
+            margin-top: 25px;
+            border-radius: 14px;
+        }
+
+        .calcBox {
+            background-color: #fff3ea;
+            padding: 15px;
+            margin-top: 25px;
+            border-radius: 14px;
+        }
+
+        .validationBox {
+            background-color: #e9f8f2;
+            padding: 15px;
+            margin-top: 25px;
+            border-radius: 14px;
+        }
+
+        button {
+            padding: 8px 18px;
+            cursor: pointer;
+            margin-top: 10px;
+            border: none;
+            border-radius: 999px;
+            background-color: #e2548f;
+            color: white;
+            font-weight: bold;
+            font-family: inherit;
+        }
+
+        button:hover { background-color: #c13b74; }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            padding: 7px;
+            border: 2px solid #f0d4e3;
+            border-radius: 10px;
+            font-family: inherit;
+            color: #4a2740;
+            background: white;
+        }
+
+        input[type="text"] { width: 300px; max-width: 90%; }
+        input[type="number"] { width: 110px; }
+
+        .tableWrap { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            border: 1px solid #f0d4e3;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th { background-color: #ffe3ef; }
+
+        .pass { color: #1d7a5f; font-weight: bold; }
+        .fail { color: #b3263f; font-weight: bold; }
+
+        footer {
+            margin-top: 30px;
+            font-size: 0.85rem;
+            color: #8a6a80;
+            text-align: center;
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 0; }
+            .container { border-radius: 0; padding: 16px; }
+            input[type="range"] { width: 100%; max-width: 100%; }
+        }
+
+        #responsePlot, #errorPlot { width: 100%; height: 460px; }
+        @media (max-width: 600px) { #responsePlot, #errorPlot { height: 360px; } }
+
+        select {
+            font-size: 1rem;
+            -webkit-appearance: none;
+            appearance: none;
+            padding: 7px 34px 7px 12px;
+            cursor: pointer;
+            background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23e2548f' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 12px center;
+        }
+
+        /* ---------- Predict, then check quiz ---------- */
+        .quizTop { display: flex; justify-content: space-between; color: #8a6a80; font-size: 0.9rem; }
+        .quizQ { font-weight: bold; margin: 8px 0 12px; }
+        .quizOpts { display: grid; gap: 8px; margin-bottom: 4px; }
+        .quizOpts label {
+            display: flex; gap: 10px; align-items: flex-start; font-weight: normal;
+            background: white; border: 2px solid #f0d4e3; border-radius: 12px; padding: 9px 12px; cursor: pointer;
+        }
+        .quizOpts input { margin-top: 4px; accent-color: #e2548f; }
+        .quizOpts label.right { border-color: #1d7a5f; background: #e9f8f2; }
+        .quizOpts label.wrong { border-color: #b3263f; background: #ffe3ef; }
+        .quizButtons { display: flex; gap: 8px; flex-wrap: wrap; }
+        button:disabled { opacity: 0.45; cursor: not-allowed; }
+        button:disabled:hover { background-color: #e2548f; }
+        button.secondary { background: white; color: #c13b74; border: 2px solid #f7b6d2; }
+        button.secondary:hover { background: #fff0f6; }
+        #quizExplain { margin: 12px 0 0; }
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <nav class="crumbs"><a href="index.html">Dynamics Toolkit</a> / Module 1</nav>
+
+    <h1>Dynamic Characteristics Toolkit</h1>
+
+    <h2>Module 1: First-Order Time Response</h2>
+
+    <p>
+        Model:
+        τdy/dt + y = Kx
+    </p>
+
+    <div class="control">
+
+        <label for="kSlider">Gain K:</label>
+
+        <input
+            type="range"
+            id="kSlider"
+            min="1"
+            max="10"
+            value="1"
+            step="1">
+
+        <span class="value" id="kValue">1</span>
+
+    </div>
+
+
+    <div class="control">
+
+        <label for="tauSlider">Time Constant τ:</label>
+
+        <input
+            type="range"
+            id="tauSlider"
+            min="1"
+            max="10"
+            value="2"
+            step="1">
+
+        <span class="value" id="tauValue">2</span> s
+
+    </div>
+
+
+    <div class="control">
+
+        <label for="inputType">Input Type:</label>
+
+        <select id="inputType">
+
+            <option value="step">Step</option>
+
+            <option value="ramp">Ramp</option>
+
+        </select>
+
+    </div>
+
+
+    <!-- Predict then check: commit to an answer, then run the experiment -->
+
+    <div class="predictBox">
+
+        <h3>Predict, then check</h3>
+
+        <div class="quizTop">
+            <span id="quizCount"></span>
+            <span id="quizScore"></span>
+        </div>
+
+        <p class="quizQ" id="quizQuestion"></p>
+
+        <div class="quizOpts" id="quizOptions"></div>
+
+        <div class="quizButtons">
+            <button id="quizLock" disabled>Lock in my guess</button>
+            <button id="quizRun" class="secondary" hidden>Run the experiment</button>
+            <button id="quizNext" class="secondary" hidden>Next question</button>
+        </div>
+
+        <p id="quizExplain" aria-live="polite"></p>
+
+    </div>
+
+
+    <!-- Main response plot -->
+
+    <div id="responsePlot"></div>
+
+
+    <!-- Ramp information -->
+
+    <div
+        id="rampInfo"
+        class="infoBox">
+    </div>
+
+
+    <!-- Error fraction -->
+
+    <h3 id="errorTitle">
+        Error-Fraction Plot
+    </h3>
+
+    <div id="errorPlot"></div>
+
+
+    <!-- Validation -->
+
+    <div class="validationBox">
+
+        <h3>Validation Checks</h3>
+
+        <div class="tableWrap">
+        <table>
+
+            <tr>
+                <th>Test</th>
+                <th>Expected Value</th>
+                <th>Calculated Value</th>
+                <th>Status</th>
+            </tr>
+
+            <tr>
+
+                <td>y(τ) / K</td>
+
+                <td>0.632</td>
+
+                <td id="validationTau"></td>
+
+                <td id="statusTau"></td>
+
+            </tr>
+
+            <tr>
+
+                <td>y(3τ) / K</td>
+
+                <td>0.950</td>
+
+                <td id="validation3Tau"></td>
+
+                <td id="status3Tau"></td>
+
+            </tr>
+
+        </table>
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    const kSlider =
+        document.getElementById("kSlider");
+
+    const tauSlider =
+        document.getElementById("tauSlider");
+
+    const inputType =
+        document.getElementById("inputType");
+
+    const kValue =
+        document.getElementById("kValue");
+
+    const tauValue =
+        document.getElementById("tauValue");
+
+
+    /* Colors and plot style shared with Module 2 */
+
+    const ROSE = "#e2548f";
+    const LILAC = "#8f6fdc";
+    const MINT = "#4fb89a";
+
+    function styleLayout(layout) {
+        layout.paper_bgcolor = "rgba(0,0,0,0)";
+        layout.plot_bgcolor = "#fffafc";
+        layout.font = { color: "#4a2740" };
+        layout.legend = { orientation: "h", y: -0.25 };
+        layout.margin = { t: 50, r: 20, b: 60, l: 60 };
+        layout.xaxis.gridcolor = "#f5dce8";
+        layout.yaxis.gridcolor = "#f5dce8";
+        return layout;
+    }
+
+
+    function drawPlot() {
+
+        const K =
+            parseFloat(kSlider.value);
+
+        const tau =
+            parseFloat(tauSlider.value);
+
+
+        let t = [];
+
+        let y = [];
+
+        let input = [];
+
+        let errorFraction = [];
+
+
+        /*
+            Generate points from
+            t = 0 to t = 10τ.
+
+            This guarantees that
+            τ and 3τ are visible.
+        */
+
+        const maxTime = 10 * tau;
+
+        const numberOfPoints = 300;
+
+
+        for (
+            let i = 0;
+            i <= numberOfPoints;
+            i++
+        ) {
+
+            const time =
+                (i / numberOfPoints) * maxTime;
+
+            t.push(time);
+
+
+            if (
+                inputType.value === "step"
+            ) {
+
+                /*
+                    Step response:
+
+                    y(t) =
+                    K(1 - e^(-t/τ))
+
+                    Unit step amplitude A = 1
+                */
+
+                const output =
+                    K *
+                    (
+                        1 -
+                        Math.exp(-time / tau)
+                    );
+
+                y.push(output);
+
+                input.push(K);
+
+
+                /*
+                    Error fraction:
+
+                    (K - y) / K
+                    = e^(-t/τ)
+                */
+
+                const error =
+                    Math.exp(-time / tau);
+
+                errorFraction.push(error);
+
+            }
+
+            else {
+
+                /*
+                    Ramp response:
+
+                    x(t) = t
+
+                    y(t) =
+                    K[
+                        t - τ
+                        + τe^(-t/τ)
+                    ]
+                */
+
+                const output =
+                    K *
+                    (
+                        time
+                        - tau
+                        + tau *
+                        Math.exp(-time / tau)
+                    );
+
+                y.push(output);
+
+                input.push(K * time);
+
+            }
+        }
+
+
+        /*
+            OUTPUT RESPONSE
+        */
+
+        const outputTrace = {
+
+            x: t,
+
+            y: y,
+
+            mode: "lines",
+
+            name: "Output y(t)",
+
+            line: { color: ROSE, width: 3 }
+
+        };
+
+
+        let traces = [];
+
+
+        /*
+            STEP
+        */
+
+        if (
+            inputType.value === "step"
+        ) {
+
+            const inputTrace = {
+
+                x: t,
+
+                y: input,
+
+                mode: "lines",
+
+                name: "Final Value KA",
+
+                line: { color: LILAC, width: 2, dash: "dash" }
+
+            };
+
+
+            /*
+                Important points
+            */
+
+            const yTau =
+                K *
+                (
+                    1 -
+                    Math.exp(-1)
+                );
+
+
+            const y3Tau =
+                K *
+                (
+                    1 -
+                    Math.exp(-3)
+                );
+
+
+            const markerTrace = {
+
+                x: [
+                    tau,
+                    3 * tau
+                ],
+
+                y: [
+                    yTau,
+                    y3Tau
+                ],
+
+                mode:
+                    "markers+text",
+
+                name:
+                    "Important Points",
+
+                text: [
+
+                    "63.2% at t = τ",
+
+                    "95% at t = 3τ"
+
+                ],
+
+                textposition:
+                    "top center",
+
+                marker: {
+                    size: 11,
+                    color: MINT
+                }
+
+            };
+
+
+            traces = [
+
+                inputTrace,
+
+                outputTrace,
+
+                markerTrace
+
+            ];
+
+
+            document
+                .getElementById(
+                    "rampInfo"
+                )
+                .innerHTML = "";
+
+
+            /*
+                Hide the empty ramp box
+                in step mode.
+            */
+
+            document
+                .getElementById(
+                    "rampInfo"
+                )
+                .style.display =
+                "none";
+
+
+            document
+                .getElementById(
+                    "errorTitle"
+                )
+                .style.display =
+                "block";
+
+
+            document
+                .getElementById(
+                    "errorPlot"
+                )
+                .style.display =
+                "block";
+
+
+            /*
+                Error-fraction plot
+            */
+
+            const errorTrace = {
+
+                x: t,
+
+                y: errorFraction,
+
+                mode: "lines",
+
+                name:
+                    "Error Fraction",
+
+                line: { color: LILAC, width: 3 }
+
+            };
+
+
+            const errorLayout = {
+
+                title:
+                    "Error Fraction vs Time",
+
+                xaxis: {
+
+                    title:
+                        "Time (s)"
+
+                },
+
+                yaxis: {
+
+                    title:
+                        "(KA - y) / KA",
+
+                    type: "log"
+
+                },
+
+                annotations: [
+
+                    {
+
+                        x:
+                            5 * tau,
+
+                        /*
+                            On a log axis Plotly expects
+                            log10 of the position.
+                        */
+                        y:
+                            Math.log10(Math.exp(-5)),
+
+                        yshift: 14,
+
+                        text:
+                            "Slope = -1/τ = " +
+                            (
+                                -1 / tau
+                            ).toFixed(3),
+
+                        showarrow:
+                            false
+
+                    }
+
+                ]
+
+            };
+
+
+            Plotly.newPlot(
+
+                "errorPlot",
+
+                [errorTrace],
+
+                styleLayout(errorLayout),
+
+                { responsive: true }
+
+            );
+
+        }
+
+
+        /*
+            RAMP
+        */
+
+        else {
+
+            const inputTrace = {
+
+                x: t,
+
+                y: input,
+
+                mode: "lines",
+
+                name:
+                    "Input Ramp Kx(t)",
+
+                line: { color: LILAC, width: 2 }
+
+            };
+
+
+            traces = [
+
+                inputTrace,
+
+                outputTrace
+
+            ];
+
+
+            /*
+                Ramp lag and
+                steady-state error
+            */
+
+            const steadyStateError =
+                K * tau;
+
+
+            document
+                .getElementById(
+                    "rampInfo"
+                )
+                .innerHTML =
+
+                "<b>Ramp Lag:</b> τ = "
+                + tau
+                + " s"
+
+                + "<br><br>"
+
+                + "<b>Steady-State Error:</b> "
+                + "Kτ = "
+                + steadyStateError
+                    .toFixed(2);
+
+
+            document
+                .getElementById(
+                    "rampInfo"
+                )
+                .style.display =
+                "block";
+
+
+            /*
+                Hide error plot
+                for ramp.
+            */
+
+            document
+                .getElementById(
+                    "errorTitle"
+                )
+                .style.display =
+                "none";
+
+
+            document
+                .getElementById(
+                    "errorPlot"
+                )
+                .style.display =
+                "none";
+
+        }
+
+
+        /*
+            Main plot
+        */
+
+        const layout = {
+
+            title:
+
+                inputType.value === "step"
+
+                ? "First-Order Step Response"
+
+                : "First-Order Ramp Response",
+
+
+            xaxis: {
+
+                title:
+                    "Time (s)"
+
+            },
+
+
+            yaxis: {
+
+                title:
+                    "Amplitude"
+
+            }
+
+        };
+
+
+        Plotly.newPlot(
+
+            "responsePlot",
+
+            traces,
+
+            styleLayout(layout),
+
+            { responsive: true }
+
+        );
+
+
+        /*
+            Validation
+        */
+
+        runValidation(
+            K,
+            tau
+        );
+
+    }
+
+
+    function runValidation(
+        K,
+        tau
+    ) {
+
+        /*
+            Expected:
+            y(τ) = 0.632 KA
+        */
+
+        const yTau =
+            K *
+            (
+                1 -
+                Math.exp(-1)
+            );
+
+
+        const ratioTau =
+            yTau / K;
+
+
+        /*
+            Expected:
+            y(3τ) = 0.95 KA
+        */
+
+        const y3Tau =
+            K *
+            (
+                1 -
+                Math.exp(-3)
+            );
+
+
+        const ratio3Tau =
+            y3Tau / K;
+
+
+        document
+            .getElementById(
+                "validationTau"
+            )
+            .textContent =
+            ratioTau.toFixed(3);
+
+
+        document
+            .getElementById(
+                "validation3Tau"
+            )
+            .textContent =
+            ratio3Tau.toFixed(3);
+
+
+        /*
+            PASS / FAIL
+        */
+
+        const statusTauPass =
+            Math.abs(
+                ratioTau - 0.632
+            ) < 0.005;
+
+        const statusTauCell =
+            document.getElementById("statusTau");
+
+        statusTauCell.textContent =
+            statusTauPass ? "PASS ✓" : "FAIL ✗";
+
+        statusTauCell.className =
+            statusTauPass ? "pass" : "fail";
+
+
+        const status3TauPass =
+            Math.abs(
+                ratio3Tau - 0.95
+            ) < 0.005;
+
+        const status3TauCell =
+            document.getElementById("status3Tau");
+
+        status3TauCell.textContent =
+            status3TauPass ? "PASS ✓" : "FAIL ✗";
+
+        status3TauCell.className =
+            status3TauPass ? "pass" : "fail";
+
+    }
+
+
+    /*
+        Predict then check
+
+        Each question: the user commits to an answer,
+        then "Run the experiment" moves the sliders
+        on their own so the plot shows the result.
+    */
+
+    const quizQuestions = [
+        {
+            question: "Step input, K = 1. If τ doubles from 2 s to 4 s, the time to reach 63.2% of the final value will…",
+            options: ["halve", "stay the same", "double"],
+            correct: 2,
+            explain: "y(τ) = K(1 − e⁻¹) = 0.632K, so the 63.2% point is always at t = τ. Doubling τ doubles that time (2 s → 4 s). The final value does not change.",
+            start: { K: 1, tau: 2, type: "step" },
+            end: { tau: 4 }
+        },
+        {
+            question: "Step input, τ = 2 s. If K goes from 1 to 3, the time to reach 63.2% of the final value will…",
+            options: ["get shorter", "stay the same", "get longer"],
+            correct: 1,
+            explain: "K only scales the output: the final value triples (1 → 3), but y(t)/K = 1 − e^(−t/τ) does not depend on K. The 63.2% point stays at t = τ = 2 s.",
+            start: { K: 1, tau: 2, type: "step" },
+            end: { K: 3 }
+        },
+        {
+            question: "Ramp input x(t) = t, K = 1, τ = 3 s. After the start-up transient, the output follows the input…",
+            options: ["with no delay: it catches up", "with a constant delay of 3 s", "with a delay that keeps growing"],
+            correct: 1,
+            explain: "For a ramp, y(t) = K(t − τ + τe^(−t/τ)). Once the exponential dies out, y(t) = K(t − τ): the same line shifted right by τ = 3 s. The steady-state error is Kτ = 3.",
+            start: { K: 1, tau: 1, type: "ramp" },
+            end: { tau: 3 }
