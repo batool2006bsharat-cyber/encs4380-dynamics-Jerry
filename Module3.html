@@ -4,154 +4,246 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Module 3: Second-order response | ENCS4380 Dynamics Toolkit</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 <style>
-/* ---------- Design tokens ---------- */
-:root{
-  --paper:#eef2f4; --surface:#ffffff; --ink:#14213d; --muted:#52607a; --line:#c9d3dc; --grid:#dfe6ec;
-  --signal:#d1345b; --pole:#0e7c86; --band:#e0a915; --ghost:#8a97ab;
-  --good:#1d7a46; --bad:#b3261e; --good-bg:#e3f3e9; --bad-bg:#fbe5e3;
-  --serif:"Newsreader", Georgia, "Times New Roman", serif;
-  --sans:"Instrument Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  color-scheme:light;
-  box-sizing:border-box;
-  padding-top:env(safe-area-inset-top,0px);
-  padding-bottom:env(safe-area-inset-bottom,0px);
-}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --paper:#0f1722; --surface:#17212f; --ink:#e6edf5; --muted:#93a3b8; --line:#2b3a4e; --grid:#1d2a3a;
-    --signal:#ff6b8b; --pole:#3cc6cf; --band:#f3c74e; --ghost:#5f7088;
-    --good:#5fd38d; --bad:#ff8a80; --good-bg:#16301f; --bad-bg:#3a1a19;
-    color-scheme:dark;
-  }
-}
-:root[data-theme="dark"]{
-  --paper:#0f1722; --surface:#17212f; --ink:#e6edf5; --muted:#93a3b8; --line:#2b3a4e; --grid:#1d2a3a;
-  --signal:#ff6b8b; --pole:#3cc6cf; --band:#f3c74e; --ghost:#5f7088;
-  --good:#5fd38d; --bad:#ff8a80; --good-bg:#16301f; --bad-bg:#3a1a19;
-  color-scheme:dark;
-}
-*,*::before,*::after{box-sizing:inherit}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{
-  margin:0; font-family:var(--sans); font-size:16px; line-height:1.55; color:var(--ink);
-  background-color:var(--paper);
-  background-image:
-    linear-gradient(var(--grid) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-  background-size:24px 24px;
-  font-variant-numeric:tabular-nums;
-}
-.wrap{max-width:1120px; margin:0 auto; padding:20px 16px 48px}
-a{color:var(--pole)}
-nav.crumbs{font-size:.9rem; color:var(--muted); margin-bottom:8px}
+        /* ---------- Shared toolkit design (Module 2 style) ---------- */
+        * { box-sizing: border-box; }
 
-h1,h2,h3{font-family:var(--serif); font-weight:600; line-height:1.15; margin:0}
-h1{font-size:clamp(1.9rem, 4.2vw, 2.9rem); letter-spacing:-.01em; max-width:20ch}
-h2{font-size:1.55rem; margin-bottom:6px}
-h3{font-size:1.15rem; margin-bottom:6px}
-.lede{max-width:66ch; color:var(--muted); margin:10px 0 22px; font-size:1.05rem}
-.lede strong{color:var(--ink); font-weight:600}
-section{margin-top:44px}
-section > p.intro{max-width:68ch; color:var(--muted); margin:4px 0 16px}
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            margin: 0;
+            padding: 30px 12px;
+            color: #4a2740;
+            background: linear-gradient(160deg, #fff0f6, #f3e8ff);
+            min-height: 100vh;
+        }
 
-/* ---------- Main instrument ---------- */
-.instrument{
-  display:grid; grid-template-columns:300px 1fr; gap:0;
-  background:var(--surface); border:1px solid var(--line); border-radius:10px; overflow:hidden;
-}
-.controls{padding:18px; border-right:1px solid var(--line)}
-.display{padding:14px 14px 10px; min-width:0}
-@media (max-width:820px){
-  .instrument{grid-template-columns:1fr}
-  .controls{border-right:none; border-bottom:1px solid var(--line)}
-}
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background-color: white;
+            padding: 25px;
+            border-radius: 22px;
+            box-shadow: 0 10px 30px rgba(226, 84, 143, 0.18);
+        }
 
-.seg{display:flex; border:1px solid var(--line); border-radius:8px; overflow:hidden; margin-bottom:16px}
-.seg button{flex:1; border:none; background:transparent; color:var(--muted); padding:8px 6px; font:500 .9rem var(--sans); cursor:pointer}
-.seg button[aria-pressed="true"]{background:var(--ink); color:var(--surface)}
+        h1 { color: #e2548f; margin-top: 0; }
+        h2 { color: #8f6fdc; }
+        h3 { margin-top: 0; color: #c13b74; }
 
-.slider{margin-bottom:14px}
-.slider label{display:flex; justify-content:space-between; align-items:baseline; font-size:.95rem}
-.slider output{font-weight:600}
-.slider .hint{font-size:.8rem; color:var(--muted)}
-input[type=range]{width:100%; accent-color:var(--signal); margin:6px 0 0; height:28px}
+        a { color: #c13b74; }
 
-.presets{display:flex; gap:6px; flex-wrap:wrap; margin:4px 0 14px}
-.btn{
-  border:1px solid var(--line); background:var(--surface); color:var(--ink); border-radius:6px;
-  padding:7px 10px; font:500 .88rem var(--sans); cursor:pointer;
-}
-.btn:hover{border-color:var(--ink)}
-.btn.primary{background:var(--signal); border-color:var(--signal); color:#fff}
-.btn:disabled{opacity:.45; cursor:not-allowed}
-:focus-visible{outline:2px solid var(--pole); outline-offset:2px}
+        .crumbs {
+            font-size: 0.9rem;
+            color: #8a6a80;
+            margin: 0 0 8px;
+        }
 
-.checks{display:grid; gap:6px; font-size:.9rem; margin-top:6px}
-.checks label{display:flex; gap:8px; align-items:center; cursor:pointer}
+        .control { margin-bottom: 20px; }
 
-.readout{margin-top:14px; padding-top:12px; border-top:1px dashed var(--line); font-size:.92rem}
-.readout .case{font-family:var(--serif); font-size:1.2rem; font-weight:600}
-.readout .case.under{color:var(--signal)} .readout .case.crit{color:var(--band)} .readout .case.over{color:var(--pole)}
+        label { font-weight: bold; }
 
-.plot{width:100%; height:340px}
-.plot.small{height:300px}
+        input[type="range"] {
+            width: 260px;
+            max-width: 60%;
+            accent-color: #e2548f;
+            vertical-align: middle;
+        }
 
-table{border-collapse:collapse; width:100%; font-size:.92rem}
-th,td{text-align:left; padding:7px 8px; border-bottom:1px solid var(--line); vertical-align:top}
-th{font-weight:600; color:var(--muted)}
-td.num{font-weight:600}
-.metrics{margin-top:6px; overflow-x:auto}
-.metrics td.formula{color:var(--muted)}
+        .value {
+            font-weight: bold;
+            color: #e2548f;
+        }
 
-/* ---------- State-space ---------- */
-.ss-grid{display:grid; grid-template-columns:1fr 1fr; gap:18px}
-@media (max-width:820px){ .ss-grid{grid-template-columns:1fr} }
-.panel{background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:14px; min-width:0}
-.equation{font-family:var(--serif); font-size:1.08rem; display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:8px 0 12px; overflow-x:auto}
-.mat{display:inline-flex; align-items:center}
-.mat-body{position:relative; display:inline-table; padding:2px 8px}
-.mat-body::before,.mat-body::after{content:""; position:absolute; top:0; bottom:0; width:6px; border:1.5px solid currentColor}
-.mat-body::before{left:0; border-right:none}
-.mat-body::after{right:0; border-left:none}
-.mat-row{display:table-row}
-.mat-row span{display:table-cell; padding:2px 8px; text-align:center; font-family:var(--sans); font-size:.98rem}
-.mat-row span.live{color:var(--signal); font-weight:600}
-.match{border-radius:8px; padding:10px 12px; margin-top:10px; font-size:.95rem}
-.match.ok{background:var(--good-bg); color:var(--good)}
-.match.no{background:var(--bad-bg); color:var(--bad)}
-.pair{display:grid; grid-template-columns:auto 1fr; gap:4px 12px; font-size:.95rem}
-.pair dt{color:var(--muted)} .pair dd{margin:0; font-weight:600}
-.legend-note{font-size:.85rem; color:var(--muted); margin-top:4px}
+        .infoBox {
+            background-color: #f3e8ff;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 14px;
+            line-height: 1.8;
+        }
 
-/* ---------- Predict, then check ---------- */
-.predict{background:var(--surface); border:1px solid var(--line); border-left:5px solid var(--signal); border-radius:10px; padding:18px}
-.predict .q{font-family:var(--serif); font-size:1.2rem; margin:6px 0 12px; max-width:60ch}
-.predict .opts{display:grid; gap:8px; margin-bottom:12px}
-.predict .opts label{display:flex; gap:10px; align-items:flex-start; padding:9px 11px; border:1px solid var(--line); border-radius:8px; cursor:pointer}
-.predict .opts input{margin-top:4px}
-.predict .opts label.right{border-color:var(--good); background:var(--good-bg)}
-.predict .opts label.wrong{border-color:var(--bad); background:var(--bad-bg)}
-.predict .row{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
-.predict .explain{margin-top:12px; max-width:68ch}
-.predict .score{margin-left:auto; color:var(--muted); font-size:.9rem}
+        .predictBox {
+            background-color: #ffe9f2;
+            border: 2px dashed #f7b6d2;
+            padding: 15px;
+            margin-top: 25px;
+            border-radius: 14px;
+        }
 
-/* ---------- Validation ---------- */
-.badge{display:inline-block; padding:2px 9px; border-radius:20px; font-weight:600; font-size:.82rem}
-.badge.pass{background:var(--good-bg); color:var(--good)}
-.badge.fail{background:var(--bad-bg); color:var(--bad)}
-.tablewrap{overflow-x:auto; background:var(--surface); border:1px solid var(--line); border-radius:10px}
+        .calcBox {
+            background-color: #fff3ea;
+            padding: 15px;
+            margin-top: 25px;
+            border-radius: 14px;
+        }
 
-footer{margin-top:48px; font-size:.85rem; color:var(--muted)}
-@media (prefers-reduced-motion: reduce){ *{transition:none !important} }
-</style>
+        .validationBox {
+            background-color: #e9f8f2;
+            padding: 15px;
+            margin-top: 25px;
+            border-radius: 14px;
+        }
+
+        button {
+            padding: 8px 18px;
+            cursor: pointer;
+            margin-top: 10px;
+            border: none;
+            border-radius: 999px;
+            background-color: #e2548f;
+            color: white;
+            font-weight: bold;
+            font-family: inherit;
+        }
+
+        button:hover { background-color: #c13b74; }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            padding: 7px;
+            border: 2px solid #f0d4e3;
+            border-radius: 10px;
+            font-family: inherit;
+            color: #4a2740;
+            background: white;
+        }
+
+        input[type="text"] { width: 300px; max-width: 90%; }
+        input[type="number"] { width: 110px; }
+
+        .tableWrap { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            border: 1px solid #f0d4e3;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th { background-color: #ffe3ef; }
+
+        .pass { color: #1d7a5f; font-weight: bold; }
+        .fail { color: #b3263f; font-weight: bold; }
+
+        footer {
+            margin-top: 30px;
+            font-size: 0.85rem;
+            color: #8a6a80;
+            text-align: center;
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 0; }
+            .container { border-radius: 0; padding: 16px; }
+            input[type="range"] { width: 100%; max-width: 100%; }
+        }
+
+        /* ---------- Module 3 components in the shared style ---------- */
+        :root{
+          --paper:#fff0f6; --surface:#ffffff; --ink:#4a2740; --muted:#8a6a80; --line:#f0d4e3; --grid:#f5dce8;
+          --signal:#e2548f; --pole:#8f6fdc; --band:#4fb89a; --ghost:#c4a3b8;
+          --good:#1d7a5f; --bad:#b3263f; --good-bg:#e9f8f2; --bad-bg:#ffe3ef;
+          color-scheme:light;
+        }
+        h1 { font-size: clamp(1.7rem, 4vw, 2.2rem); line-height: 1.2; }
+        h2 { margin: 0 0 6px; }
+        h3 { margin-bottom: 6px; }
+        .lede { max-width: 70ch; margin: 10px 0 22px; line-height: 1.6; }
+        .lede strong { color: #c13b74; }
+        section { margin-top: 36px; }
+        section > p.intro { max-width: 70ch; color: var(--muted); margin: 4px 0 16px; }
+
+        .instrument {
+            display: grid; grid-template-columns: 290px 1fr;
+            border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: white;
+        }
+        .controls { padding: 18px; background: #fffafc; border-right: 1px solid var(--line); }
+        .display { padding: 14px 14px 10px; min-width: 0; }
+        @media (max-width: 820px) {
+            .instrument { grid-template-columns: 1fr; }
+            .controls { border-right: none; border-bottom: 1px solid var(--line); }
+        }
+
+        .seg { display: flex; gap: 6px; margin-bottom: 16px; }
+        .seg button { flex: 1; margin: 0; background: #ffe9f2; color: #c13b74; padding: 8px 6px; }
+        .seg button[aria-pressed="true"] { background: #e2548f; color: white; }
+
+        .slider { margin-bottom: 14px; }
+        .slider label { display: flex; justify-content: space-between; align-items: baseline; font-size: .95rem; }
+        .slider output { color: #e2548f; }
+        .controls input[type=range] { width: 100%; max-width: 100%; margin: 6px 0 0; height: 28px; }
+
+        .presets { display: flex; gap: 6px; flex-wrap: wrap; margin: 4px 0 14px; }
+        .btn { margin: 0; }
+        .btn:disabled { opacity: .45; cursor: not-allowed; }
+        .btn:disabled:hover { background-color: #e2548f; }
+        :focus-visible { outline: 2px solid #8f6fdc; outline-offset: 2px; }
+
+        .checks { display: grid; gap: 6px; font-size: .9rem; margin-top: 6px; }
+        .checks label { display: flex; gap: 8px; align-items: center; cursor: pointer; font-weight: normal; }
+        .checks input { accent-color: #e2548f; }
+
+        .readout { margin-top: 14px; padding: 12px; border-radius: 14px; background: #f3e8ff; font-size: .92rem; line-height: 1.7; }
+        .readout .case { font-size: 1.15rem; font-weight: bold; }
+        .readout .case.under { color: var(--signal); }
+        .readout .case.crit { color: var(--band); }
+        .readout .case.over { color: var(--pole); }
+
+        .plot { width: 100%; height: 360px; }
+        .plot.small { height: 320px; }
+
+        .metrics { margin-top: 6px; overflow-x: auto; }
+        td.num { font-weight: bold; color: #c13b74; }
+        .metrics td.formula { color: var(--muted); }
+
+        .ss-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+        @media (max-width: 820px) { .ss-grid { grid-template-columns: 1fr; } }
+        .panel { background: white; border: 1px solid var(--line); border-radius: 14px; padding: 15px; min-width: 0; }
+        .equation { font-size: 1.05rem; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 8px 0 12px; overflow-x: auto; }
+        .mat { display: inline-flex; align-items: center; }
+        .mat-body { position: relative; display: inline-table; padding: 2px 8px; }
+        .mat-body::before, .mat-body::after { content: ""; position: absolute; top: 0; bottom: 0; width: 6px; border: 1.5px solid currentColor; }
+        .mat-body::before { left: 0; border-right: none; }
+        .mat-body::after { right: 0; border-left: none; }
+        .mat-row { display: table-row; }
+        .mat-row span { display: table-cell; padding: 2px 8px; text-align: center; font-size: .98rem; }
+        .mat-row span.live { color: var(--signal); font-weight: bold; }
+        .match { border-radius: 14px; padding: 10px 12px; margin-top: 10px; font-size: .95rem; }
+        .match.ok { background: var(--good-bg); color: var(--good); }
+        .match.no { background: var(--bad-bg); color: var(--bad); }
+        .pair { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: .95rem; }
+        .pair dt { color: var(--muted); }
+        .pair dd { margin: 0; font-weight: bold; }
+        .legend-note { font-size: .85rem; color: var(--muted); margin-top: 4px; }
+
+        .predict { background: #ffe9f2; border: 2px dashed #f7b6d2; border-radius: 14px; padding: 18px; }
+        .predict .q { font-size: 1.12rem; font-weight: 600; margin: 6px 0 12px; max-width: 64ch; }
+        .predict .opts { display: grid; gap: 8px; margin-bottom: 12px; }
+        .predict .opts label { display: flex; gap: 10px; align-items: flex-start; padding: 9px 11px; background: white; border: 2px solid #f0d4e3; border-radius: 12px; cursor: pointer; font-weight: normal; }
+        .predict .opts input { margin-top: 4px; accent-color: #e2548f; }
+        .predict .opts label.right { border-color: var(--good); background: var(--good-bg); }
+        .predict .opts label.wrong { border-color: var(--bad); background: var(--bad-bg); }
+        .predict .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .predict .explain { margin-top: 12px; max-width: 70ch; }
+        .predict .score { margin-left: auto; color: var(--muted); font-size: .9rem; }
+
+        .badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-weight: bold; font-size: .82rem; }
+        .badge.pass { background: var(--good-bg); color: var(--good); }
+        .badge.fail { background: var(--bad-bg); color: var(--bad); }
+        .tablewrap { overflow-x: auto; background: #e9f8f2; padding: 15px; border-radius: 14px; }
+        .tablewrap table { background: white; margin-top: 0; }
+        @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+    </style>
 </head>
 <body>
-<div class="wrap">
+<div class="container">
   <nav class="crumbs"><a href="index.html">Dynamics Toolkit</a> / Module 3</nav>
 
   <h1>How damping shapes a second-order sensor</h1>
@@ -175,7 +267,7 @@ footer{margin-top:48px; font-size:.85rem; color:var(--muted)}
           <input type="range" id="sZeta" min="0.05" max="3" step="0.01" value="0.5">
         </div>
         <div class="slider">
-          <label for="sWn">Natural frequency ω<sub>n</sub> <output id="oWn"></output></label>
+          <label for="sWn"><span>Natural frequency ω<sub>n</sub></span> <output id="oWn"></output></label>
           <input type="range" id="sWn" min="0.5" max="20" step="0.1" value="2">
         </div>
         <div class="slider">
@@ -423,11 +515,11 @@ function simulate(A, B, F0, tEnd, N){
    Plot styling
    ========================================================= */
 function baseLayout(xTitle, yTitle){
-  const ink = css("--ink"), muted = css("--muted"), grid = css("--line");
+  const ink = css("--ink"), muted = css("--muted"), grid = css("--grid");
   return {
     margin:{ l:54, r:14, t:12, b:46 },
-    paper_bgcolor:"rgba(0,0,0,0)", plot_bgcolor:"rgba(0,0,0,0)",
-    font:{ family:"Instrument Sans, system-ui, sans-serif", color:ink, size:12 },
+    paper_bgcolor:"rgba(0,0,0,0)", plot_bgcolor:"#fffafc",
+    font:{ family:"Segoe UI, Arial, sans-serif", color:ink, size:12 },
     xaxis:{ title:{ text:xTitle, font:{ color:muted } }, gridcolor:grid, zerolinecolor:muted, linecolor:grid },
     yaxis:{ title:{ text:yTitle, font:{ color:muted } }, gridcolor:grid, zerolinecolor:muted, linecolor:grid },
     showlegend:true,
