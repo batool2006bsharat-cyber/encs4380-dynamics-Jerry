@@ -7,7 +7,7 @@ An interactive web toolkit that shows how a sensor's dynamic characteristics (τ
 
 ## 🔗 Live site
 
-**https://batool2006bsharat-cyber.github.io/encs4380-dynamics-Jerry/**
+**https://github.com/batool2006bsharat-cyber/encs4380-dynamics-Jerry/**
 
 Works on desktop and phone. No server, login or installation needed.
 
