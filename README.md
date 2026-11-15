@@ -1,6 +1,6 @@
 # Dynamic Characteristics Toolkit
 
-**ENCS4380 Interfacing Techniques · Homework 1 · Birzeit University**
+**ENCS4380 Interfacing Techniques · Homeworks 1 & 2 · Birzeit University**
 Instructor: Dr. Wasel Ghanem
 
 An interactive web toolkit that shows how a sensor's dynamic characteristics (τ, ζ and ω<sub>n</sub>) decide how far behind the real world it is. Everything runs live in the browser: move a slider and every plot redraws instantly.
@@ -20,7 +20,9 @@ Works on desktop and phone. No server, login or installation needed.
 |  Basamat Yasin  |  | Module 3: Second-order response | #3 |
 |  Niveen Antari  | 1232976 | Module 4: Guess the sensor | #4 |
 
-## 📦 What is inside
+## 📦 Homework 1 — Dynamic Characteristics
+
+### Files and modules
 
 | File | Content |
 |---|---|
@@ -63,7 +65,7 @@ Model: G(s) = Kω<sub>n</sub>²/(s² + 2ζω<sub>n</sub>s + ω<sub>n</sub>²)
 - "New sensor" starts another round, with a running score for the session.
 - A "Useful methods" panel explains how to read each parameter off the curve.
 
-## ✅ Validation checks
+## ✅ Homework 1 validation checks
 
 All six checks are recomputed by the page's own code every time it loads. They are shown on the home page and in each module.
 
@@ -79,6 +81,26 @@ All six checks are recomputed by the page's own code every time it loads. They a
 ## ⭐ Bonus: our own ODE solver
 
 Module 3 includes an RK4 solver for ẋ = Ax + BF. The "Overlay RK4 simulation" checkbox plots the RK4 result on top of the closed-form step response, and the phase-plane path and its animation are computed from the same RK4 simulation.
+
+## 🎛️ Homework 2 — PID Control Toolkit
+
+### P1: PID Playground
+
+**[Open the PID Playground](https://batool2006bsharat-cyber.github.io/encs4380-dynamics-Jerry/pid-playground.html)**
+
+An interactive closed-loop PID controller playground provided as three separate, maintainable files:
+
+| File | Purpose |
+|---|---|
+| `pid-playground.html` | Interface, plant settings, controller inputs, response panels and validation controls |
+| `pid-playground.css` | Responsive dark-themed layout and visual styling |
+| `pid-playground.js` | Simulation, PID controller, plotting, prediction checks and validation logic |
+
+**Included functionality:** first- and second-order plant selection; PID gains (Kp, Ki, Kd); closed-loop block diagram; output and control-signal charts; response metrics; pre-run predictions; and reference validation checks.
+
+To use: open the PID page from the Homework 2 card on the home page, configure a plant and gains, then select **Run**. The original four Homework 1 modules remain unchanged.
+
+> Scope: The repository currently includes Homework 2 **P1 PID Playground** only; this does not imply that the other Homework 2 pages or bonus modules are completed.
 
 ## 📸 Screenshots
 
