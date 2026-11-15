@@ -1,0 +1,277 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PID Playground | ENCS4380</title>
+  <link rel="stylesheet" href="pid-playground.css">
+  <script src="pid-playground.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <div>
+        <div class="eyebrow">ENCS4380 · HOMEWORK 2 · MODULE P1</div>
+        <h1>PID Playground</h1>
+        <p>Predict, simulate, and understand feedback control.</p>
+      </div>
+      <a class="home-link" href="index.html">← Toolkit Home</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="card" aria-labelledby="settings-title">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">CONFIGURATION</div>
+          <h2 id="settings-title">1. Plant & PID settings</h2>
+        </div>
+        <span class="pill">Live simulation</span>
+      </div>
+
+      <div class="fields">
+        <div>
+          <label for="plant">Plant model</label>
+          <select id="plant">
+            <option value="first">First-order system</option>
+            <option value="second">Second-order system</option>
+          </select>
+        </div>
+        <div>
+          <label for="setpoint">Setpoint step</label>
+          <input id="setpoint" type="number" value="1" min="0.01" step="0.1">
+        </div>
+        <div>
+          <label for="K">Plant gain K</label>
+          <input id="K" type="number" value="1" min="0.01" step="0.1">
+        </div>
+        <div class="first-only">
+          <label for="tau">Time constant τ (s)</label>
+          <input id="tau" type="number" value="1" min="0.01" step="0.1">
+        </div>
+        <div class="second-only" hidden>
+          <label for="zeta">Damping ratio ζ</label>
+          <input id="zeta" type="number" value="0.5" min="0" step="0.1">
+        </div>
+        <div class="second-only" hidden>
+          <label for="wn">Natural frequency ωn (rad/s)</label>
+          <input id="wn" type="number" value="2" min="0.01" step="0.1">
+        </div>
+      </div>
+
+      <div class="gain-box">
+        <h3>PID controller gains</h3>
+
+        <div class="gain">
+          <div class="gain-label">
+            <label for="kp">Proportional Kp</label>
+            <output id="kpValue">9.00</output>
+          </div>
+          <input type="range" id="kp" min="0" max="20" step="0.1" value="9">
+        </div>
+
+        <div class="gain">
+          <div class="gain-label">
+            <label for="ki">Integral Ki</label>
+            <output id="kiValue">0.00</output>
+          </div>
+          <input type="range" id="ki" min="0" max="20" step="0.1" value="0">
+        </div>
+
+        <div class="gain">
+          <div class="gain-label">
+            <label for="kd">Derivative Kd</label>
+            <output id="kdValue">0.00</output>
+          </div>
+          <input type="range" id="kd" min="0" max="10" step="0.1" value="0">
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="runBtn" type="button">▶ Run simulation</button>
+        <button id="resetBtn" type="button" class="secondary">Reset defaults</button>
+      </div>
+
+      <p class="note">
+        Numerical closed-loop simulation (Euler, Δt = 0.001 s).
+        Unity feedback, derivative on measurement,
+        anti-windup, actuator limit ±20.
+      </p>
+      <p id="errorMessage" class="error" role="alert"></p>
+    </section>
+
+    <section class="card">
+      <div class="eyebrow">CONTROL ARCHITECTURE</div>
+      <h2>2. Closed-loop block diagram</h2>
+
+      <div class="diagram-scroll">
+        <svg viewBox="0 0 880 260" role="img"
+             aria-label="PID closed-loop system with negative feedback">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10"
+                    refX="9" refY="5"
+                    markerWidth="6" markerHeight="6"
+                    orient="auto">
+              <path d="M0 0L10 5L0 10Z" fill="#43dbc1"/>
+            </marker>
+          </defs>
+
+          <g class="wires">
+            <path d="M42 90H137"/>
+            <path d="M177 90H248"/>
+            <path d="M440 90H540"/>
+            <path d="M732 90H850"/>
+            <path d="M800 90V213H157V110"/>
+          </g>
+
+          <g class="diagram-labels">
+            <text x="50" y="71">r(t)</text>
+            <text x="193" y="71">e(t)</text>
+            <text x="478" y="71">u(t)</text>
+            <text x="804" y="71">y(t)</text>
+          </g>
+
+          <circle cx="157" cy="90" r="20" class="sum"/>
+          <text x="145" y="83" class="sign">+</text>
+          <text x="145" y="104" class="sign">−</text>
+
+          <rect x="248" y="49" width="192" height="82"
+                rx="10" class="diagram-block"/>
+          <text x="344" y="83" class="block-title">PID controller</text>
+          <text x="344" y="107" class="block-sub">P + I + D</text>
+
+          <rect x="540" y="49" width="192" height="82"
+                rx="10" class="diagram-block"/>
+          <text x="636" y="82" class="block-title">Plant</text>
+          <text id="plantEquation" x="636" y="106" class="block-sub">
+            K / (τs + 1)
+          </text>
+
+          <text x="474" y="240" class="feedback-label">
+            Unity negative feedback: e(t) = r(t) − y(t)
+          </text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">LIVE SIMULATION</div>
+          <h2>3. System response</h2>
+        </div>
+        <div class="time-choice">
+          <label for="timeRange">Graph time range</label>
+          <select id="timeRange">
+            <option value="2">2 s</option>
+            <option value="5" selected>5 s</option>
+            <option value="10">10 s</option>
+            <option value="20">20 s</option>
+          </select>
+        </div>
+      </div>
+      <div class="chart">
+        <canvas id="responseChart"
+                role="img"
+                aria-label="System output and setpoint against time"></canvas>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="eyebrow">CONTROLLER OUTPUT</div>
+      <h2>4. Control signal u(t)</h2>
+      <p class="note">
+        Applied actuator command with upper and lower limits, ±20.
+      </p>
+      <div class="chart">
+        <canvas id="controlChart"
+                role="img"
+                aria-label="Control signal and limits against time"></canvas>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="eyebrow">PERFORMANCE ANALYSIS</div>
+      <h2>5. Performance metrics</h2>
+      <div class="metrics">
+        <div class="metric">
+          <span>Rise time (10–90%)</span>
+          <strong id="riseTime">—</strong>
+        </div>
+        <div class="metric">
+          <span>Overshoot</span>
+          <strong id="overshoot">—</strong>
+        </div>
+        <div class="metric">
+          <span>Settling time (±2%)</span>
+          <strong id="settlingTime">—</strong>
+        </div>
+        <div class="metric">
+          <span>Final error*</span>
+          <strong id="steadyError">—</strong>
+        </div>
+      </div>
+      <p class="note">
+        *Last-sample error estimates steady-state error only
+        when the output has converged. Unsettled trajectories
+        are marked accordingly.
+      </p>
+    </section>
+
+    <section class="card">
+      <div class="eyebrow">PREDICT, THEN CHECK</div>
+      <h2>6. Make a prediction before running</h2>
+      <p class="note">
+        The current run is your baseline. Keep the plant and
+        setpoint unchanged, change one or more PID gains,
+        choose a prediction, then click Run simulation.
+        Afterwards click Check prediction.
+      </p>
+
+      <div class="predict-grid">
+        <div>
+          <label for="prediction">Prediction</label>
+          <select id="prediction">
+            <option value="">Choose before running</option>
+            <option value="faster">Faster rise time</option>
+            <option value="slower">Slower rise time</option>
+            <option value="overshoot">More overshoot</option>
+            <option value="lessOvershoot">Less overshoot</option>
+            <option value="error">Lower final error</option>
+            <option value="same">No significant change in reported metrics</option>
+          </select>
+        </div>
+        <div class="predict-actions">
+          <button type="button" id="checkBtn" class="secondary">
+            Check prediction
+          </button>
+        </div>
+      </div>
+      <div id="predictionResult" class="result" aria-live="polite">
+        Baseline ready. Change the gains and select
+        your prediction before the next run.
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="eyebrow">MODEL VERIFICATION</div>
+      <h2>7. Validation checks</h2>
+      <p class="note">
+        Reference plant K = 1, τ = 1 s:
+        P-only Kp = 9 (closed-loop τ = 0.1 s and error = 10%);
+        PI Kp = 1, Ki = 1 (ωn = 1 rad/s, ζ = 1);
+        another stable PI case approaches zero final error.
+      </p>
+      <button id="validateBtn" type="button">
+        Run validation tests
+      </button>
+      <div id="validationResults" class="result" aria-live="polite">
+        Tests have not been run yet.
+      </div>
+    </section>
+  </main>
+
+  <footer>ENCS4380 · Homework 2 · P1 PID Playground</footer>
+</body>
+</html>
