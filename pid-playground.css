@@ -1,0 +1,432 @@
+
+:root {
+  --bg: #090f1e;
+  --panel: #131d30;
+  --panel2: #1b2940;
+  --border: #2a3a53;
+  --text: #eef4ff;
+  --muted: #a8b8d1;
+  --primary: #729dff;
+  --accent: #43dbc1;
+  --danger: #ff7b8d;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.6 "Segoe UI", Arial, sans-serif;
+}
+
+.site-header {
+  background: #10192b;
+  border-bottom: 1px solid var(--border);
+}
+
+.header-inner {
+  max-width: 1190px;
+  margin: auto;
+  padding: 28px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+h1 {
+  font-size: 32px;
+  margin: 0;
+}
+
+h2 {
+  font-size: 23px;
+  margin: 4px 0 22px;
+}
+
+h3 {
+  font-size: 17px;
+  margin: 0 0 12px;
+}
+
+p {
+  margin: 8px 0;
+  color: var(--muted);
+}
+
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 1.6px;
+  font-weight: 800;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.home-link {
+  color: var(--text);
+  text-decoration: none;
+  border: 1px solid var(--border);
+  padding: 10px 16px;
+  border-radius: 9px;
+  white-space: nowrap;
+}
+
+.home-link:hover {
+  border-color: var(--accent);
+}
+
+main {
+  max-width: 1190px;
+  margin: 32px auto;
+  padding: 0 20px;
+  display: grid;
+  gap: 22px;
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 28px;
+  min-width: 0;
+}
+
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.pill {
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 5px 13px;
+  color: var(--accent);
+  font-size: 12px;
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.fields > [hidden] {
+  display: none !important;
+}
+
+label {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 650;
+  margin: 0 0 7px;
+}
+
+input[type="number"],
+select {
+  width: 100%;
+  padding: 12px 13px;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  color: var(--text);
+  font: inherit;
+}
+
+input:focus-visible,
+select:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.gain-box {
+  margin-top: 24px;
+  padding: 22px;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 13px;
+}
+
+.gain {
+  margin: 16px 0;
+}
+
+.gain:last-child {
+  margin-bottom: 0;
+}
+
+.gain-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.gain-label output {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.actions {
+  display: flex;
+  gap: 11px;
+  flex-wrap: wrap;
+  margin-top: 22px;
+}
+
+button {
+  background: var(--primary);
+  color: #0c1930;
+  border: 0;
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-weight: 750;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+button:hover {
+  filter: brightness(1.12);
+}
+
+button.secondary {
+  background: var(--panel2);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.note {
+  font-size: 13px;
+}
+
+.error {
+  color: var(--danger);
+  font-weight: 650;
+}
+
+.diagram-scroll {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: #0c1526;
+  padding: 15px;
+}
+
+.diagram-scroll svg {
+  display: block;
+  width: 100%;
+  min-width: 620px;
+}
+
+.wires {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2.4;
+  marker-end: url(#arrow);
+}
+
+.diagram-labels,
+.sign {
+  fill: var(--text);
+  font-size: 18px;
+}
+
+.sum {
+  fill: var(--panel);
+  stroke: var(--accent);
+  stroke-width: 2.5;
+}
+
+.diagram-block {
+  fill: var(--panel2);
+  stroke: var(--primary);
+  stroke-width: 2;
+}
+
+.block-title,
+.block-sub,
+.feedback-label {
+  text-anchor: middle;
+  fill: var(--text);
+}
+
+.block-title {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.block-sub {
+  font-size: 14px;
+  fill: var(--muted);
+}
+
+.feedback-label {
+  font-size: 15px;
+  fill: var(--muted);
+}
+
+.chart {
+  height: 355px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  background: #0c1526;
+  border-radius: 12px;
+}
+
+.chart canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.time-choice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.time-choice label {
+  margin: 0;
+}
+
+.time-choice select {
+  width: 115px;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.metric {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 22px 12px;
+  text-align: center;
+}
+
+.metric span {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.metric strong {
+  font-size: 25px;
+  color: var(--accent);
+  overflow-wrap: anywhere;
+}
+
+.predict-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: end;
+}
+
+.predict-actions button {
+  white-space: nowrap;
+}
+
+.result {
+  margin-top: 18px;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 15px;
+  white-space: pre-line;
+}
+
+.validation-row {
+  border-bottom: 1px solid var(--border);
+  padding: 8px 0;
+}
+
+.validation-row:last-child {
+  border-bottom: 0;
+}
+
+.pass {
+  color: var(--accent);
+  font-weight: 750;
+}
+
+.fail {
+  color: var(--danger);
+  font-weight: 750;
+}
+
+footer {
+  text-align: center;
+  padding: 26px;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+  margin-top: 30px;
+  font-size: 13px;
+}
+
+@media (max-width: 760px) {
+  .header-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  h1 {
+    font-size: 28px;
+  }
+
+  .card {
+    padding: 20px;
+  }
+
+  .metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .chart {
+    height: 285px;
+  }
+
+  .predict-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .predict-actions button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 460px) {
+  .fields,
+  .metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .time-choice {
+    width: 100%;
+  }
+
+  .time-choice select {
+    flex: 1;
+  }
+
+  .actions button {
+    flex: 1;
+  }
+}
