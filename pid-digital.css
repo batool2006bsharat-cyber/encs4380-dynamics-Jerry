@@ -1,0 +1,225 @@
+/* P3 Digital PID styles (ENCS4380 PID Control Toolkit) */
+
+/* ---------- Shared toolkit design (Module 2 style) ---------- */
+* { box-sizing: border-box; }
+
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    margin: 0;
+    padding: 30px 12px;
+    color: #4a2740;
+    background: linear-gradient(160deg, #fff0f6, #f3e8ff);
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1000px;
+    margin: auto;
+    background-color: white;
+    padding: 25px;
+    border-radius: 22px;
+    box-shadow: 0 10px 30px rgba(226, 84, 143, 0.18);
+}
+
+h1 { color: #e2548f; margin-top: 0; }
+h2 { color: #8f6fdc; }
+h3 { margin-top: 0; color: #c13b74; }
+
+a { color: #c13b74; }
+
+.crumbs {
+    font-size: 0.9rem;
+    color: #8a6a80;
+    margin: 0 0 8px;
+}
+
+.control { margin-bottom: 20px; }
+
+label { font-weight: bold; }
+
+input[type="range"] {
+    width: 260px;
+    max-width: 60%;
+    accent-color: #e2548f;
+    vertical-align: middle;
+}
+
+.value {
+    font-weight: bold;
+    color: #e2548f;
+}
+
+.infoBox {
+    background-color: #f3e8ff;
+    padding: 15px;
+    margin-top: 15px;
+    border-radius: 14px;
+    line-height: 1.8;
+}
+
+.predictBox {
+    background-color: #ffe9f2;
+    border: 2px dashed #f7b6d2;
+    padding: 15px;
+    margin-top: 25px;
+    border-radius: 14px;
+}
+
+.calcBox {
+    background-color: #fff3ea;
+    padding: 15px;
+    margin-top: 25px;
+    border-radius: 14px;
+}
+
+.validationBox {
+    background-color: #e9f8f2;
+    padding: 15px;
+    margin-top: 25px;
+    border-radius: 14px;
+}
+
+button {
+    padding: 8px 18px;
+    cursor: pointer;
+    margin-top: 10px;
+    border: none;
+    border-radius: 999px;
+    background-color: #e2548f;
+    color: white;
+    font-weight: bold;
+    font-family: inherit;
+}
+
+button:hover { background-color: #c13b74; }
+
+input[type="text"],
+input[type="number"],
+select {
+    padding: 7px;
+    border: 2px solid #f0d4e3;
+    border-radius: 10px;
+    font-family: inherit;
+    color: #4a2740;
+    background: white;
+}
+
+input[type="text"] { width: 300px; max-width: 90%; }
+input[type="number"] { width: 110px; }
+
+.tableWrap { overflow-x: auto; }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th, td {
+    border: 1px solid #f0d4e3;
+    padding: 10px;
+    text-align: center;
+}
+
+th { background-color: #ffe3ef; }
+
+.pass { color: #1d7a5f; font-weight: bold; }
+.fail { color: #b3263f; font-weight: bold; }
+
+footer {
+    margin-top: 30px;
+    font-size: 0.85rem;
+    color: #8a6a80;
+    text-align: center;
+}
+
+@media (max-width: 600px) {
+    body { padding: 0; }
+    .container { border-radius: 0; padding: 16px; }
+    input[type="range"] { width: 100%; max-width: 100%; }
+}
+
+
+/* ---------- P3 layout ---------- */
+.lede { max-width: 72ch; line-height: 1.6; }
+.formulaBox {
+    background: #f3e8ff; border-radius: 14px; padding: 12px 16px; margin: 14px 0 20px;
+    font-size: 1.05rem; overflow-x: auto; white-space: nowrap;
+}
+.instrument { display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 860px) { .instrument { grid-template-columns: 1fr; } }
+.controls { background: #fffafc; border: 1px solid #f0d4e3; border-radius: 14px; padding: 16px; }
+.controls h3 { font-size: 1rem; margin: 14px 0 6px; }
+.controls h3:first-child { margin-top: 0; }
+.slider { margin-bottom: 10px; }
+.slider label { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: .93rem; }
+.slider output { color: #e2548f; font-weight: bold; white-space: nowrap; }
+.controls input[type="range"] { width: 100%; max-width: 100%; margin: 4px 0 0; }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.seg button { flex: 1 1 auto; margin: 0; background: #ffe9f2; color: #c13b74; padding: 7px 6px; font-size: .9rem; }
+.motorNote { background: #f3e8ff; border-radius: 12px; padding: 8px 10px; font-size: .85rem; margin: 0 0 10px; }
+.motorNote[hidden] { display: none; }
+
+/* ---------- Micromouse section ---------- */
+.motorSection { background: #fff3ea; border-radius: 14px; padding: 16px 18px; }
+.motorSection h3 { margin: 18px 0 6px; }
+.mmInputs { display: flex; flex-wrap: wrap; gap: 10px 24px; margin: 10px 0 4px; }
+.mmInputs label { font-weight: bold; font-size: .93rem; }
+.mmInputs input { margin-left: 6px; width: 90px; }
+textarea#logIn {
+    width: 100%; min-height: 120px; padding: 10px; border: 2px solid #f0d4e3; border-radius: 12px;
+    font: 13px/1.4 Consolas, "Courier New", monospace; color: #4a2740; background: white; resize: vertical;
+}
+.btnRow { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.btnRow button { margin-top: 8px; }
+#fitOut[hidden], #useFit[hidden], #fitPlotBox[hidden] { display: none; }
+#plotFit { width: 100%; height: 280px; }
+.seg button[aria-pressed="true"] { background: #e2548f; color: white; }
+.checks { display: grid; gap: 6px; font-size: .92rem; margin-top: 8px; }
+.checks label { display: flex; gap: 8px; align-items: center; font-weight: normal; cursor: pointer; }
+.checks input { accent-color: #e2548f; width: 16px; height: 16px; flex-shrink: 0; }
+.awRow { background: #ffe9f2; border: 2px dashed #f7b6d2; border-radius: 12px; padding: 8px 10px; }
+.warn { background: #fff3ea; border-radius: 12px; padding: 8px 10px; font-size: .88rem; margin-top: 8px; }
+.warn[hidden] { display: none; }
+
+.plotBox { background: white; border: 1px solid #f0d4e3; border-radius: 14px; padding: 8px; margin-bottom: 14px; min-width: 0; }
+.plot { width: 100%; height: 330px; }
+@media (max-width: 600px) { .plot { height: 290px; } }
+.readout { margin-top: 10px; }
+.readout td:first-child { text-align: left; }
+.verdict { border-radius: 12px; padding: 9px 12px; margin-top: 10px; font-size: .95rem; }
+.verdict.good { background: #e9f8f2; color: #1d7a5f; }
+.verdict.meh { background: #fff3ea; color: #9a5317; }
+.verdict.bad { background: #ffe3ef; color: #b3263f; }
+
+section { margin-top: 30px; }
+.note { color: #8a6a80; font-size: .9rem; margin: 6px 0 0; }
+
+/* ---------- Predict, then check quiz ---------- */
+.quizTop { display: flex; justify-content: space-between; color: #8a6a80; font-size: 0.9rem; }
+.quizQ { font-weight: bold; margin: 8px 0 12px; }
+.quizOpts { display: grid; gap: 8px; margin-bottom: 4px; }
+.quizOpts label {
+    display: flex; gap: 10px; align-items: flex-start; font-weight: normal;
+    background: white; border: 2px solid #f0d4e3; border-radius: 12px; padding: 9px 12px; cursor: pointer;
+}
+.quizOpts input { margin-top: 4px; accent-color: #e2548f; }
+.quizOpts label.right { border-color: #1d7a5f; background: #e9f8f2; }
+.quizOpts label.wrong { border-color: #b3263f; background: #ffe3ef; }
+.quizButtons { display: flex; gap: 8px; flex-wrap: wrap; }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+button:disabled:hover { background-color: #e2548f; }
+button.secondary { background: white; color: #c13b74; border: 2px solid #f7b6d2; }
+button.secondary:hover { background: #fff0f6; }
+#quizExplain { margin: 12px 0 0; }
+
+/* ---------- Arduino code ---------- */
+.codeHead { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.codeHead h3 { margin: 0; }
+.codeHead button { margin: 0; }
+pre.code {
+    background: #2b1d2a; color: #fbeaf3; border-radius: 14px; padding: 14px 16px; margin: 10px 0 0;
+    overflow-x: auto; font: 13px/1.5 Consolas, "Courier New", monospace; tab-size: 2;
+}
+pre.code .c { color: #c9a6bd; }
+#copyMsg, .copyMsg { color: #1d7a5f; font-weight: bold; font-size: .9rem; }
