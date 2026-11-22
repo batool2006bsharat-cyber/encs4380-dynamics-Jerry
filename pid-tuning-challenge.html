@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>P4: Tuning Challenge | ENCS4380</title>
+  <link rel="stylesheet" href="pid-playground.css">
+  <link rel="stylesheet" href="pid-tuning-challenge.css">
+  <script src="pid-tuning-challenge.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <div>
+        <div class="eyebrow">ENCS4380 · HOMEWORK 2 · MODULE P4</div>
+        <h1>PID Tuning Challenge</h1>
+        <p>A hidden plant. A clear specification. Your PID gains.</p>
+      </div>
+      <a class="home-link" href="index.html">← Toolkit Home</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="card" aria-labelledby="introHeading">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">HOW TO PLAY</div>
+          <h2 id="introHeading">Tune a controller without knowing the plant parameters</h2>
+        </div>
+        <span class="pill">Predict → Test → Improve</span>
+      </div>
+      <div class="how-grid">
+        <div class="how-step"><strong>01 · Observe</strong><p>The plant order is shown, but its parameters are hidden. Read the target specifications.</p></div>
+        <div class="how-step"><strong>02 · Tune</strong><p>Choose Kp, Ki and Kd. Predict whether the design will meet every specification.</p></div>
+        <div class="how-step"><strong>03 · Check</strong><p>Simulate the closed loop, inspect the response, and improve the gains. Reveal the plant when finished.</p></div>
+      </div>
+      <div class="session-bar" aria-live="polite">
+        <div><span>Round</span><strong id="roundNumber">1</strong></div>
+        <div><span>Best this round</span><strong id="bestScore">—</strong></div>
+        <div><span>Session total</span><strong id="sessionScore">0 / 0</strong></div>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="tuneHeading">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">HIDDEN RANDOM PLANT</div>
+          <h2 id="tuneHeading">1. Choose your PID gains</h2>
+        </div>
+        <span class="plant-pill" id="plantTag">Selecting plant…</span>
+      </div>
+      <p class="note">The plant is selected at random. It reuses the first- and second-order models from Homework 1. The setpoint is a unit step, and the controller sees the true output through unity feedback.</p>
+      <p class="model-line" id="modelEquation">G(s) = ?</p>
+      <div class="tune-layout">
+        <div>
+          <div class="gain-box">
+            <h3>Controller gains</h3>
+            <div class="gain">
+              <div class="gain-label"><label for="kp">Proportional Kp</label><output id="kpValue">2.00</output></div>
+              <input id="kp" type="range" min="0" max="20" step="0.1" value="2">
+            </div>
+            <div class="gain">
+              <div class="gain-label"><label for="ki">Integral Ki</label><output id="kiValue">0.00</output></div>
+              <input id="ki" type="range" min="0" max="20" step="0.1" value="0">
+            </div>
+            <div class="gain">
+              <div class="gain-label"><label for="kd">Derivative Kd</label><output id="kdValue">0.00</output></div>
+              <input id="kd" type="range" min="0" max="4" step="0.05" value="0">
+            </div>
+            <button id="resetGains" type="button" class="secondary">Reset gains</button>
+            <p class="note">The controller uses derivative on measurement and conditional anti-windup. The actuator is limited to 0–20 units, similar to a nonnegative PWM command.</p>
+          </div>
+        </div>
+        <div>
+          <div class="spec-panel">
+            <h3>Required specifications</h3>
+            <div class="spec-row"><span>Maximum overshoot</span><strong id="specOvershoot">≤ 10%</strong></div>
+            <div class="spec-row"><span>Settling time (±2% band)</span><strong id="specSettling">≤ 3.0 s</strong></div>
+            <div class="spec-row"><span>Steady-state error</span><strong id="specError">≈ 0% (≤ 1%)</strong></div>
+            <p class="note">A ≤ 1% finite-simulation tolerance is used for “zero” steady-state error. A response still oscillating at the end cannot pass this check.</p>
+          </div>
+          <div class="predict-box">
+            <div class="eyebrow">PREDICT, THEN CHECK</div>
+            <h3>Will your chosen gains meet all three specs?</h3>
+            <div class="prediction-choices">
+              <label><input type="radio" name="prediction" value="pass"> Yes — all three will pass</label>
+              <label><input type="radio" name="prediction" value="fail"> No — at least one will fail</label>
+            </div>
+            <p class="note" id="predictionFeedback" aria-live="polite">Select your prediction before testing.</p>
+          </div>
+          <div class="actions">
+            <button id="testBtn" type="button">▶ Test these gains</button>
+            <button id="hintBtn" type="button" class="secondary">Show tuning hint</button>
+          </div>
+          <p id="hintText" class="hint-result" hidden></p>
+          <p id="errorMessage" class="error" role="alert"></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="responseHeading">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">NUMERICAL CLOSED-LOOP SIMULATION</div>
+          <h2 id="responseHeading">2. Response and actuator signal</h2>
+        </div>
+        <span class="pill" id="trialLabel">No tests yet</span>
+      </div>
+      <p class="note">The plant is integrated with Euler (Δt = 0.002 s). Changing gains does not count as a new attempt until you select a prediction and press Test these gains.</p>
+      <div class="chart"><canvas id="responseChart" role="img" aria-label="Plant output and setpoint versus time"></canvas></div>
+      <div class="chart chart-spaced"><canvas id="controlChart" role="img" aria-label="Control signal versus time with actuator limits"></canvas></div>
+      <div id="placeholder" class="empty-message">Your closed-loop response will appear here after the first test.</div>
+    </section>
+
+    <section class="card" id="resultsSection" aria-labelledby="resultsHeading">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">TUNING VERDICT</div>
+          <h2 id="resultsHeading">3. Pass / Fail and score</h2>
+        </div>
+        <strong id="roundScore" class="big-score">—</strong>
+      </div>
+      <div class="results-grid" id="specResults" aria-live="polite">
+        <div class="empty-message">Test a set of PID gains to see your results.</div>
+      </div>
+      <div class="score-explanation">Scoring: overshoot 40 points, settling time 35 points, steady-state error 25 points. Passing a criterion earns all of its points; a near miss earns partial credit. All three PASS = 100/100.</div>
+      <p id="overallVerdict" class="verdict-text" aria-live="polite"></p>
+      <div class="actions">
+        <button id="revealBtn" type="button" class="secondary" disabled>Reveal hidden plant</button>
+        <button id="newPlantBtn" type="button">New random plant →</button>
+      </div>
+      <div class="reveal-box" id="revealBox" hidden aria-live="polite"></div>
+    </section>
+
+    <section class="card" aria-labelledby="methodsHeading">
+      <div class="eyebrow">USEFUL METHODS</div>
+      <h2 id="methodsHeading">Tuning ideas</h2>
+      <div class="methods-grid">
+        <div><strong>P: Kp</strong><p>Often speeds up rise time, but too much can increase overshoot. P-only control generally leaves step steady-state error.</p></div>
+        <div><strong>I: Ki</strong><p>Accumulates error and can remove steady-state error. Large integral action can produce overshoot and oscillation.</p></div>
+        <div><strong>D: Kd</strong><p>Responds to the rate of the measured output and often reduces overshoot, but does not remove steady-state error by itself.</p></div>
+      </div>
+      <p class="note">The tuning challenge is separate from “My System.” Your Micromouse motor parameters must come from an encoder/PWM step test or a cited source, not from the randomly generated plants here.</p>
+    </section>
+  </main>
+
+  <footer>ENCS4380 · Homework 2 · P4 Tuning Challenge</footer>
+</body>
+</html>
