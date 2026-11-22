@@ -1,148 +1,188 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>P3: Digital PID | ENCS4380 PID Control Toolkit</title>
 
     <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 
-    <link rel="stylesheet" href="pid-digital.css">
-</head>
+    <link rel="stylesheet" href="pid-digital.css" />
+  </head>
 
-<body>
+  <body>
+    <div class="container">
+      <nav class="crumbs">
+        <a href="index.html">Dynamics Toolkit</a> / PID Control / P3
+      </nav>
 
-<div class="container">
+      <h1>Digital PID: what the Arduino really does</h1>
 
-    <nav class="crumbs"><a href="index.html">Dynamics Toolkit</a> / PID Control / P3</nav>
+      <h2>Module P3: Digital PID</h2>
 
-    <h1>Digital PID: what the Arduino really does</h1>
+      <p class="lede">
+        A microcontroller cannot watch the output all the time. Every T<sub>s</sub>
+        seconds it reads the sensor once, computes one new control value, and holds it
+        until the next sample. The plant keeps moving in between, so the controller is
+        always working with slightly old information. A small T<sub>s</sub> behaves like
+        the continuous PID from P1. A large T<sub>s</sub> adds delay, so the overshoot
+        grows until the loop can no longer settle.
+      </p>
 
-    <h2>Module P3: Digital PID</h2>
+      <div class="formulaBox">
+        u[k] = K<sub>p</sub> e[k] + K<sub>i</sub> T<sub>s</sub> Σ<sub>j=0..k</sub> e[j] +
+        K<sub>d</sub> (e[k] − e[k−1]) / T<sub>s</sub>, &nbsp; then u is held constant
+        until sample k + 1.
+      </div>
 
-    <p class="lede">
-        A microcontroller cannot watch the output all the time. Every T<sub>s</sub> seconds it reads the sensor once,
-        computes one new control value, and holds it until the next sample. The plant keeps moving in between, so
-        the controller is always working with slightly old information. A small T<sub>s</sub> behaves like the continuous
-        PID from P1. A large T<sub>s</sub> adds delay, so the overshoot grows until the loop can no longer settle.
-    </p>
+      <!-- ================= Main instrument ================= -->
 
-    <div class="formulaBox">
-        u[k] = K<sub>p</sub> e[k] + K<sub>i</sub> T<sub>s</sub> Σ<sub>j=0..k</sub> e[j] + K<sub>d</sub> (e[k] − e[k−1]) / T<sub>s</sub>,
-        &nbsp; then u is held constant until sample k + 1.
-    </div>
-
-
-    <!-- ================= Main instrument ================= -->
-
-    <div class="instrument">
-
+      <div class="instrument">
         <div class="controls">
+          <h3>Plant</h3>
+          <div class="seg" role="group" aria-label="Plant order">
+            <button id="plantFirst" aria-pressed="true">First order</button>
+            <button id="plantSecond" aria-pressed="false">Second order</button>
+            <button id="plantMotor" aria-pressed="false">Micromouse motor</button>
+          </div>
+          <p class="motorNote" id="motorNote" hidden>
+            Units: wheel speed in rpm, u = PWM in % (0 to 100). The starting K and τ are a
+            typical small motor, not yours: measure your own with the step test in “Apply
+            it to the Micromouse motor” below.
+          </p>
 
-            <h3>Plant</h3>
-            <div class="seg" role="group" aria-label="Plant order">
-                <button id="plantFirst" aria-pressed="true">First order</button>
-                <button id="plantSecond" aria-pressed="false">Second order</button>
-                <button id="plantMotor" aria-pressed="false">Micromouse motor</button>
-            </div>
-            <p class="motorNote" id="motorNote" hidden>
-                Units: wheel speed in rpm, u = PWM in % (0 to 100). The starting K and τ are a typical small
-                motor, not yours: measure your own with the step test in “Apply it to the Micromouse motor” below.
-            </p>
+          <div class="slider">
+            <label for="sK"
+              ><span id="lblK">Plant gain K</span> <output id="oK"></output
+            ></label>
+            <input type="range" id="sK" min="0.2" max="5" step="0.1" />
+          </div>
+          <div class="slider" id="rowTau">
+            <label for="sTau"
+              ><span id="lblTau">Time constant τ</span> <output id="oTau"></output
+            ></label>
+            <input type="range" id="sTau" min="0.1" max="5" step="0.1" />
+          </div>
+          <div class="slider" id="rowZeta" hidden>
+            <label for="sZeta"
+              ><span>Damping ratio ζ</span> <output id="oZeta"></output
+            ></label>
+            <input type="range" id="sZeta" min="0.1" max="2" step="0.05" />
+          </div>
+          <div class="slider" id="rowWn" hidden>
+            <label for="sWn"
+              ><span>Natural frequency ω<sub>n</sub></span> <output id="oWn"></output
+            ></label>
+            <input type="range" id="sWn" min="0.5" max="10" step="0.1" />
+          </div>
 
-            <div class="slider">
-                <label for="sK"><span id="lblK">Plant gain K</span> <output id="oK"></output></label>
-                <input type="range" id="sK" min="0.2" max="5" step="0.1">
-            </div>
-            <div class="slider" id="rowTau">
-                <label for="sTau"><span id="lblTau">Time constant τ</span> <output id="oTau"></output></label>
-                <input type="range" id="sTau" min="0.1" max="5" step="0.1">
-            </div>
-            <div class="slider" id="rowZeta" hidden>
-                <label for="sZeta"><span>Damping ratio ζ</span> <output id="oZeta"></output></label>
-                <input type="range" id="sZeta" min="0.1" max="2" step="0.05">
-            </div>
-            <div class="slider" id="rowWn" hidden>
-                <label for="sWn"><span>Natural frequency ω<sub>n</sub></span> <output id="oWn"></output></label>
-                <input type="range" id="sWn" min="0.5" max="10" step="0.1">
-            </div>
+          <h3>Controller gains</h3>
+          <div class="slider">
+            <label for="sKp"
+              ><span>K<sub>p</sub></span> <output id="oKp"></output
+            ></label>
+            <input type="range" id="sKp" min="0" max="20" step="0.1" />
+          </div>
+          <div class="slider">
+            <label for="sKi"
+              ><span>K<sub>i</sub></span> <output id="oKi"></output
+            ></label>
+            <input type="range" id="sKi" min="0" max="20" step="0.1" />
+          </div>
+          <div class="slider">
+            <label for="sKd"
+              ><span>K<sub>d</sub></span> <output id="oKd"></output
+            ></label>
+            <input type="range" id="sKd" min="0" max="2" step="0.01" />
+          </div>
 
-            <h3>Controller gains</h3>
-            <div class="slider">
-                <label for="sKp"><span>K<sub>p</sub></span> <output id="oKp"></output></label>
-                <input type="range" id="sKp" min="0" max="20" step="0.1">
-            </div>
-            <div class="slider">
-                <label for="sKi"><span>K<sub>i</sub></span> <output id="oKi"></output></label>
-                <input type="range" id="sKi" min="0" max="20" step="0.1">
-            </div>
-            <div class="slider">
-                <label for="sKd"><span>K<sub>d</sub></span> <output id="oKd"></output></label>
-                <input type="range" id="sKd" min="0" max="2" step="0.01">
-            </div>
+          <h3>Digital loop</h3>
+          <div class="slider">
+            <label for="sTs"
+              ><span>Sampling time T<sub>s</sub></span> <output id="oTs"></output
+            ></label>
+            <input type="range" id="sTs" min="0" max="1000" step="1" />
+          </div>
+          <div class="slider">
+            <label for="sUmax"
+              ><span id="lblUmax">Control limit u<sub>max</sub></span>
+              <output id="oUmax"></output
+            ></label>
+            <input type="range" id="sUmax" min="0.5" max="10" step="0.1" />
+          </div>
+          <div class="slider">
+            <label for="sR"
+              ><span id="lblR">Setpoint step r</span> <output id="oR"></output
+            ></label>
+            <input type="range" id="sR" min="0.2" max="3" step="0.1" />
+          </div>
 
-            <h3>Digital loop</h3>
-            <div class="slider">
-                <label for="sTs"><span>Sampling time T<sub>s</sub></span> <output id="oTs"></output></label>
-                <input type="range" id="sTs" min="0" max="1000" step="1">
-            </div>
-            <div class="slider">
-                <label for="sUmax"><span id="lblUmax">Control limit u<sub>max</sub></span> <output id="oUmax"></output></label>
-                <input type="range" id="sUmax" min="0.5" max="10" step="0.1">
-            </div>
-            <div class="slider">
-                <label for="sR"><span id="lblR">Setpoint step r</span> <output id="oR"></output></label>
-                <input type="range" id="sR" min="0.2" max="3" step="0.1">
-            </div>
+          <div class="checks">
+            <label class="awRow"
+              ><input type="checkbox" id="cAw" />
+              <span
+                ><b>Anti-windup</b> (stop integrating while u is stuck at its limit)</span
+              ></label
+            >
+            <label
+              ><input type="checkbox" id="cCont" />
+              <span>Compare with continuous PID (T<sub>s</sub> → 0)</span></label
+            >
+            <label
+              ><input type="checkbox" id="cParts" />
+              <span>Show the P, I and D parts of u</span></label
+            >
+          </div>
 
-            <div class="checks">
-                <label class="awRow"><input type="checkbox" id="cAw"> <span><b>Anti-windup</b> (stop integrating while u is stuck at its limit)</span></label>
-                <label><input type="checkbox" id="cCont"> <span>Compare with continuous PID (T<sub>s</sub> → 0)</span></label>
-                <label><input type="checkbox" id="cParts"> <span>Show the P, I and D parts of u</span></label>
-            </div>
-
-            <p class="warn" id="reachWarn" hidden></p>
-
+          <p class="warn" id="reachWarn" hidden></p>
         </div>
 
         <div class="display">
+          <div class="plotBox">
+            <div
+              id="plotY"
+              class="plot"
+              role="img"
+              aria-label="Output and setpoint plot"
+            ></div>
+          </div>
 
-            <div class="plotBox">
-                <div id="plotY" class="plot" role="img" aria-label="Output and setpoint plot"></div>
-            </div>
+          <div class="plotBox">
+            <div
+              id="plotU"
+              class="plot"
+              role="img"
+              aria-label="Stair-step control signal plot"
+            ></div>
+          </div>
 
-            <div class="plotBox">
-                <div id="plotU" class="plot" role="img" aria-label="Stair-step control signal plot"></div>
-            </div>
+          <div class="tableWrap readout">
+            <table>
+              <thead>
+                <tr>
+                  <th>Metric</th>
+                  <th id="hDig">Digital</th>
+                  <th>Continuous (T<sub>s</sub> → 0)</th>
+                </tr>
+              </thead>
+              <tbody id="metricBody"></tbody>
+            </table>
+          </div>
 
-            <div class="tableWrap readout">
-                <table>
-                    <thead>
-                        <tr><th>Metric</th><th id="hDig">Digital</th><th>Continuous (T<sub>s</sub> → 0)</th></tr>
-                    </thead>
-                    <tbody id="metricBody"></tbody>
-                </table>
-            </div>
-
-            <div class="verdict" id="verdict"></div>
-            <div class="verdict" id="designNote" hidden></div>
-
+          <div class="verdict" id="verdict"></div>
+          <div class="verdict" id="designNote" hidden></div>
         </div>
+      </div>
 
-    </div>
+      <!-- ================= Predict, then check ================= -->
 
-
-    <!-- ================= Predict, then check ================= -->
-
-    <div class="predictBox">
-
+      <div class="predictBox">
         <h3>Predict, then check</h3>
 
         <div class="quizTop">
-            <span id="quizCount"></span>
-            <span id="quizScore"></span>
+          <span id="quizCount"></span>
+          <span id="quizScore"></span>
         </div>
 
         <p class="quizQ" id="quizQuestion"></p>
@@ -150,137 +190,161 @@
         <div class="quizOpts" id="quizOptions"></div>
 
         <div class="quizButtons">
-            <button id="quizLock" disabled>Lock in my guess</button>
-            <button id="quizRun" class="secondary" hidden>Run the experiment</button>
-            <button id="quizNext" class="secondary" hidden>Next question</button>
+          <button id="quizLock" disabled>Lock in my guess</button>
+          <button id="quizRun" class="secondary" hidden>Run the experiment</button>
+          <button id="quizNext" class="secondary" hidden>Next question</button>
         </div>
 
         <p id="quizExplain" aria-live="polite"></p>
+      </div>
 
-    </div>
+      <!-- ================= Performance against Ts ================= -->
 
-
-    <!-- ================= Performance against Ts ================= -->
-
-    <section aria-labelledby="hSweep">
+      <section aria-labelledby="hSweep">
         <h2 id="hSweep">How performance falls as T<sub>s</sub> grows</h2>
-        <p class="note" style="margin-bottom:10px">
-            The page runs the same loop for 40 sampling times from 2 ms to 1 s, keeping everything else as set above.
-            ✕ marks a loop that never settles. The dashed line is your current T<sub>s</sub>.
+        <p class="note" style="margin-bottom: 10px">
+          The page runs the same loop for 40 sampling times from 2 ms to 1 s, keeping
+          everything else as set above. ✕ marks a loop that never settles. The dashed line
+          is your current T<sub>s</sub>.
         </p>
         <div class="plotBox">
-            <div id="plotSweep" class="plot" role="img" aria-label="Overshoot and settling time against sampling time"></div>
+          <div
+            id="plotSweep"
+            class="plot"
+            role="img"
+            aria-label="Overshoot and settling time against sampling time"
+          ></div>
         </div>
-    </section>
+      </section>
 
+      <!-- ================= Arduino code ================= -->
 
-    <!-- ================= Arduino code ================= -->
-
-    <section aria-labelledby="hCode">
+      <section aria-labelledby="hCode">
         <div class="codeHead">
-            <h2 id="hCode" style="margin:0">Arduino code for these gains</h2>
-            <span>
-                <span id="copyMsg" aria-live="polite"></span>
-                <button id="copyBtn">Copy code</button>
-            </span>
+          <h2 id="hCode" style="margin: 0">Arduino code for these gains</h2>
+          <span>
+            <span id="copyMsg" aria-live="polite"></span>
+            <button id="copyBtn">Copy code</button>
+          </span>
         </div>
         <p class="note" id="codeNote">
-            This is the same loop the simulation above runs, line for line. Change a slider and the code updates.
-            Set <code>readOutput()</code> and <code>writeControl()</code> for your own sensor and actuator.
+          This is the same loop the simulation above runs, line for line. Change a slider
+          and the code updates. Set <code>readOutput()</code> and
+          <code>writeControl()</code> for your own sensor and actuator.
         </p>
         <pre class="code"><code id="code"></code></pre>
-    </section>
+      </section>
 
+      <!-- ================= Micromouse motor ================= -->
 
-    <!-- ================= Micromouse motor ================= -->
-
-    <section class="motorSection" aria-labelledby="hMotor">
-        <h2 id="hMotor" style="margin-top:0">Apply it to the Micromouse motor</h2>
-        <p class="note" style="color:#4a2740">
-            Micromouse groups must find K and τ of the drive motor from a PWM step test logged with the encoder,
-            then design the speed loop with 0.6 ≤ ζ ≤ 0.8 and a PWM command that stays within 0–100 %.
-            These three steps do exactly that.
+      <section class="motorSection" aria-labelledby="hMotor">
+        <h2 id="hMotor" style="margin-top: 0">Apply it to the Micromouse motor</h2>
+        <p class="note" style="color: #4a2740">
+          Micromouse groups must find K and τ of the drive motor from a PWM step test
+          logged with the encoder, then design the speed loop with 0.6 ≤ ζ ≤ 0.8 and a PWM
+          command that stays within 0–100 %. These three steps do exactly that.
         </p>
 
         <div class="mmInputs">
-            <label for="inCpr">Encoder counts per wheel revolution <input type="number" id="inCpr" min="1" step="1" value="360"></label>
-            <label for="inStep">PWM step for the test (%) <input type="number" id="inStep" min="5" max="100" step="5" value="50"></label>
+          <label for="inCpr"
+            >Encoder counts per wheel revolution
+            <input type="number" id="inCpr" min="1" step="1" value="360"
+          /></label>
+          <label for="inStep"
+            >PWM step for the test (%)
+            <input type="number" id="inStep" min="5" max="100" step="5" value="50"
+          /></label>
         </div>
         <p class="note">
-            Counts per revolution = encoder lines on channel A × gear ratio (the code counts rising edges of channel A only).
-            Check your motor's datasheet.
+          Counts per revolution = encoder lines on channel A × gear ratio (the code counts
+          rising edges of channel A only). Check your motor's datasheet.
         </p>
 
         <h3>1. Run the step test</h3>
         <div class="codeHead">
-            <p class="note" style="margin:0">Lift the wheels off the table, upload this sketch, open the Serial Monitor at 115200 baud and copy everything it prints.</p>
-            <span>
-                <span id="copyStepMsg" class="copyMsg" aria-live="polite"></span>
-                <button id="copyStepBtn">Copy step test</button>
-            </span>
+          <p class="note" style="margin: 0">
+            Lift the wheels off the table, upload this sketch, open the Serial Monitor at
+            115200 baud and copy everything it prints.
+          </p>
+          <span>
+            <span id="copyStepMsg" class="copyMsg" aria-live="polite"></span>
+            <button id="copyStepBtn">Copy step test</button>
+          </span>
         </div>
         <pre class="code"><code id="stepCode"></code></pre>
 
         <h3>2. Paste the log to find K and τ</h3>
-        <textarea id="logIn" spellcheck="false" placeholder="Paste the Serial Monitor output here, starting with the line  t_ms,rpm"></textarea>
+        <textarea
+          id="logIn"
+          spellcheck="false"
+          placeholder="Paste the Serial Monitor output here, starting with the line  t_ms,rpm"
+        ></textarea>
         <div class="btnRow">
-            <button id="fitBtn">Find K and τ</button>
-            <button id="useFit" class="secondary" hidden>Use these values in the simulation</button>
+          <button id="fitBtn">Find K and τ</button>
+          <button id="useFit" class="secondary" hidden>
+            Use these values in the simulation
+          </button>
         </div>
         <div class="infoBox" id="fitOut" hidden></div>
-        <div class="plotBox" id="fitPlotBox" hidden style="margin-top:12px">
-            <div id="plotFit" role="img" aria-label="Measured step response and fitted first-order curve"></div>
+        <div class="plotBox" id="fitPlotBox" hidden style="margin-top: 12px">
+          <div
+            id="plotFit"
+            role="img"
+            aria-label="Measured step response and fitted first-order curve"
+          ></div>
         </div>
 
         <h3>3. Design the speed loop and copy its code</h3>
-        <p class="note" style="color:#4a2740">
-            Choose “Micromouse motor” under Plant (or press “Use these values”). Then press the button below for a
-            starting PI design with ζ = 0.7, check that the PWM stays under 100 % at your T<sub>s</sub>, and copy the code
-            from “Arduino code” above: in this mode it reads the speed from the encoder and writes the PWM in %.
+        <p class="note" style="color: #4a2740">
+          Choose “Micromouse motor” under Plant (or press “Use these values”). Then press
+          the button below for a starting PI design with ζ = 0.7, check that the PWM stays
+          under 100 % at your T<sub>s</sub>, and copy the code from “Arduino code” above:
+          in this mode it reads the speed from the encoder and writes the PWM in %.
         </p>
         <div class="btnRow">
-            <button id="suggestBtn">Suggest PI gains for ζ = 0.7</button>
-            <span class="note" id="suggestMsg" style="margin:8px 0 0"></span>
+          <button id="suggestBtn">Suggest PI gains for ζ = 0.7</button>
+          <span class="note" id="suggestMsg" style="margin: 8px 0 0"></span>
         </div>
         <p class="note">
-            How the suggestion works: with K<sub>p</sub> = 1/K the term (1 + KK<sub>p</sub>)/τ equals 2/τ, so 2ζω<sub>n</sub> = 2/τ
-            gives ω<sub>n</sub> = 1/(ζτ), and ω<sub>n</sub><sup>2</sup> = KK<sub>i</sub>/τ gives K<sub>i</sub> = 1/(ζ<sup>2</sup>τK).
-            These are the same PI formulas as validation check 2.
+          How the suggestion works: with K<sub>p</sub> = 1/K the term (1 +
+          KK<sub>p</sub>)/τ equals 2/τ, so 2ζω<sub>n</sub> = 2/τ gives ω<sub>n</sub> =
+          1/(ζτ), and ω<sub>n</sub><sup>2</sup> = KK<sub>i</sub>/τ gives K<sub>i</sub> =
+          1/(ζ<sup>2</sup>τK). These are the same PI formulas as validation check 2.
         </p>
-    </section>
+      </section>
 
+      <!-- ================= Validation ================= -->
 
-    <!-- ================= Validation ================= -->
-
-    <div class="validationBox">
-
+      <div class="validationBox">
         <h3>Validation checks</h3>
 
-        <p class="note" style="margin:0 0 4px">
-            Plant K/(τs + 1) with K = 1 and τ = 1 s, run through this page's own digital loop with T<sub>s</sub> = 1 ms
-            (the homework's checks 1 to 3), plus one check that only P3 can make.
+        <p class="note" style="margin: 0 0 4px">
+          Plant K/(τs + 1) with K = 1 and τ = 1 s, run through this page's own digital
+          loop with T<sub>s</sub> = 1 ms (the homework's checks 1 to 3), plus one check
+          that only P3 can make.
         </p>
 
         <div class="tableWrap">
-            <table>
-                <thead>
-                    <tr><th>Test</th><th>Expected Value</th><th>Calculated Value</th><th>Status</th></tr>
-                </thead>
-                <tbody id="valBody"></tbody>
-            </table>
+          <table>
+            <thead>
+              <tr>
+                <th>Test</th>
+                <th>Expected Value</th>
+                <th>Calculated Value</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="valBody"></tbody>
+          </table>
         </div>
+      </div>
 
+      <footer>
+        ENCS4380 Interfacing Techniques, Birzeit University · PID Control Toolkit · Module
+        P3
+      </footer>
     </div>
 
-    <footer>
-        ENCS4380 Interfacing Techniques, Birzeit University · PID Control Toolkit · Module P3
-    </footer>
-
-</div>
-
-
-<script src="pid-digital.js"></script>
-
-</body>
-
+    <script src="pid-digital.js"></script>
+  </body>
 </html>
