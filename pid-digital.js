@@ -1,8 +1,8 @@
 "use strict";
 
-/* =========================================================
+/* 
    Colors and plot style (same palette as the rest of the toolkit)
-   ========================================================= */
+   */
 
 const ROSE = "#e2548f";
 const LILAC = "#8f6fdc";
@@ -29,9 +29,9 @@ const plotConfig = { responsive: true, displayModeBar: false };
 const $ = id => document.getElementById(id);
 
 
-/* =========================================================
+/*
    State
-   ========================================================= */
+   */
 
 const state = {
     plant: "first", K: 1, tau: 1, zeta: 0.5, wn: 2,
@@ -67,12 +67,12 @@ function setPlant(newPlant) {
 const U_MIN = 0;     // the actuator cannot go below 0 (like a PWM duty cycle of 0 %)
 
 
-/* =========================================================
+/* 
    Plant model, stepped in time with RK4
    First order:  τ y' + y = K u   (also the Micromouse motor: y in rpm, u in % PWM)
    Second order: y'' + 2ζωn y' + ωn² y = K ωn² u
    x = [y, y']
-   ========================================================= */
+    */
 
 function plantDeriv(p, x, u) {
     if (p.plant !== "second") {
@@ -105,13 +105,13 @@ function simTime(p) {
 }
 
 
-/* =========================================================
+/*
    The digital PID loop
    Every Ts the controller samples y, computes u[k] with the
    homework formula, clamps it to [U_MIN, uMax] and holds it.
    Between samples the plant is stepped with RK4 (several small
    steps per sample). This is exactly the code shown below.
-   ========================================================= */
+   */
 
 function simulate(p, Ts, tEnd) {
     const substeps = Math.max(1, Math.ceil(Ts / (plantTimeScale(p) / 50)));
@@ -194,10 +194,10 @@ function readMetrics(t, y, r) {
 }
 
 
-/* =========================================================
+/* 
    Sampling-time slider: logarithmic, snapped to whole milliseconds
    so the simulation and the Arduino code use exactly the same Ts.
-   ========================================================= */
+   */
 
 const TS_MIN = 0.001, TS_MAX = 1;
 function sliderToTs(v) {
@@ -209,9 +209,9 @@ function tsToSlider(ts) {
 }
 
 
-/* =========================================================
+/* 
    Controls
-   ========================================================= */
+    */
 
 const sliders = [
     ["sK", "K", "oK", v => isMotor() ? v.toFixed(1) + " rpm/%" : v.toFixed(1)],
@@ -287,9 +287,9 @@ $("cCont").addEventListener("change", e => { state.showCont = e.target.checked; 
 $("cParts").addEventListener("change", e => { state.showParts = e.target.checked; update(); });
 
 
-/* =========================================================
+/* 
    Drawing
-   ========================================================= */
+   */
 
 const CONT_TS = 0.001;     // "continuous" reference: the same loop sampled every 1 ms
 
@@ -791,9 +791,9 @@ function fallbackCopy(text, done, msgId) {
 }
 
 
-/* =========================================================
+/* 
    Micromouse: step test inputs, K and τ from the log, PI suggestion
-   ========================================================= */
+   */
 
 $("inCpr").addEventListener("input", e => {
     const v = parseFloat(e.target.value);
@@ -937,9 +937,9 @@ $("suggestBtn").addEventListener("click", () => {
 });
 
 
-/* =========================================================
+/* 
    Predict, then check
-   ========================================================= */
+   */
 
 const base = { plant: "first", K: 1, tau: 1, Kp: 5, Ki: 5, Kd: 0.2, uMax: 8, r: 1, aw: true, showCont: true, showParts: false };
 
@@ -1140,9 +1140,9 @@ function runValidation() {
 }
 
 
-/* =========================================================
+/* 
    Start
-   ========================================================= */
+   */
 
 update();
 showQuestion();
