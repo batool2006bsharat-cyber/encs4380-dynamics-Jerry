@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My System | ENCS4380 PID Control</title>
+<link rel="stylesheet" href="pid-playground.css">
+<style>
+.system-intro{line-height:1.7;color:#a8b8d1}.system-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.system-grid label{display:block;font-weight:650;margin-bottom:7px}.system-grid input,.system-grid select{width:100%;padding:11px;border:1px solid #40516c;border-radius:10px;background:#101b2e;color:#eef4ff}
+.system-note{padding:14px;border-radius:12px;background:#18263b;color:#c7d4e8;line-height:1.65;margin:14px 0}
+.system-results{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.system-results .metric{min-height:90px}.system-results small{display:block;color:#a8b8d1}.system-results strong{display:block;font-size:1.3rem;margin-top:8px}
+#systemChart{width:100%;height:300px;background:#0c1526;border-radius:12px}
+#arduinoCode{white-space:pre;overflow:auto;background:#0c1526;color:#d7e5ff;padding:16px;border-radius:12px;line-height:1.5}
+.system-warning{color:#ffd36b}.system-success{color:#43dbc1}
+@media(max-width:600px){#systemChart{height:240px}}
+</style>
+</head>
+<body>
+<header class="site-header"><div class="header-inner"><div><div class="eyebrow">ENCS4380 · HOMEWORK 2 · APPLICATION</div><h1>My System: Micromouse Drive Motor</h1><p>Identify the motor, choose a speed-loop specification, and design a PI controller.</p></div><a class="home-link" href="index.html">← Toolkit Home</a></div></header>
+<main>
+<section class="card">
+<div class="eyebrow">1. IDENTIFY THE PLANT</div><h2>Measured motor model</h2>
+<p class="system-intro">For the Micromouse drive motor, the plant is modelled as G(s) = K / (τs + 1), where the input is PWM duty cycle (%) and the output is wheel speed (rpm). Enter the values obtained from your own encoder/PWM step test. Do not use the example values from P3 as measured results.</p>
+<div class="system-grid">
+<div><label for="gainK">Measured K (rpm per % PWM)</label><input id="gainK" type="number" min="0.001" step="any" placeholder="Enter measured K" required></div>
+<div><label for="timeTau">Measured τ (seconds)</label><input id="timeTau" type="number" min="0.001" step="any" placeholder="Enter measured τ" required></div>
+<div><label for="speedRef">Desired wheel speed (rpm)</label><input id="speedRef" type="number" min="1" step="1" value="300"></div>
+<div><label for="damping">Target damping ratio ζ</label><select id="damping"><option value="0.6">0.6</option><option value="0.7" selected>0.7 (recommended target)</option><option value="0.8">0.8</option></select></div>
+</div>
+<div class="system-note"><strong>Where do K and τ come from?</strong><br>Run the PWM step-test sketch in P3 with the drive wheels safely lifted. Record encoder-derived wheel speed, paste the Serial Monitor log into P3, and use its fitted K and τ. Record the test PWM step, encoder counts per wheel revolution, date, and which motor was tested in your report/README.</div>
+<div class="actions"><button id="designBtn" type="button">Calculate my controller</button><a class="home-link" href="pid-digital.html">Open P3 step test & Arduino generator →</a></div>
+<p id="systemError" class="error" role="alert"></p>
+</section>
+<section class="card" id="designResults" hidden>
+<div class="eyebrow">2. CONTROLLER DESIGN</div><h2>Designed PI gains</h2>
+<p class="system-intro">Using the PI design relation Kp = 1/K and Ki = 1/(ζ²τK), which gives the selected damping ratio for the first-order motor model. Derivative gain is set to zero for this PI design.</p>
+<div class="system-results">
+<div class="metric"><small>Plant gain K</small><strong id="outK">—</strong></div>
+<div class="metric"><small>Time constant τ</small><strong id="outTau">—</strong></div>
+<div class="metric"><small>Target ζ</small><strong id="outZeta">—</strong></div>
+<div class="metric"><small>Proportional Kp</small><strong id="outKp">—</strong></div>
+<div class="metric"><small>Integral Ki</small><strong id="outKi">—</strong></div>
+<div class="metric"><small>Derivative Kd</small><strong>0</strong></div>
+</div>
+<p id="feasibility" class="system-note"></p>
+</section>
+<section class="card" id="responseSection" hidden>
+<div class="eyebrow">3. SIMULATED RESPONSE</div><h2>Wheel speed vs. setpoint</h2>
+<p class="system-intro">Euler simulation of the closed-loop motor model with PI control, conditional anti-windup, and PWM saturation from 0% to 100%.</p>
+<canvas id="systemChart" aria-label="Simulated motor speed and setpoint" role="img"></canvas>
+<div class="system-results" style="margin-top:14px">
+<div class="metric"><small>Rise time (10–90%)</small><strong id="resultRise">—</strong></div>
+<div class="metric"><small>Overshoot</small><strong id="resultOS">—</strong></div>
+<div class="metric"><small>Settling time (±2%)</small><strong id="resultSettle">—</strong></div>
+<div class="metric"><small>Steady-state error</small><strong id="resultError">—</strong></div>
+<div class="metric"><small>Maximum PWM used</small><strong id="resultPWM">—</strong></div>
+</div>
+<p id="specStatus" class="system-note"></p>
+</section>
+<section class="card" id="codeSection" hidden>
+<div class="eyebrow">4. GENERATED CONTROLLER CODE</div><h2>Arduino PI speed-loop core</h2>
+<p class="system-intro">This code uses the calculated gains and a 10 ms sampling period. Connect the encoder speed calculation and motor-driver pins to match your actual hardware. The complete encoder/PWM sketch generator and step-test tool remain in P3.</p>
+<pre id="arduinoCode"></pre>
+<div class="actions"><button id="copyCode" type="button">Copy code</button><a class="home-link" href="pid-digital.html">Open P3 Digital PID →</a></div>
+<p id="copyStatus" class="system-intro" aria-live="polite"></p>
+</section>
+<section class="card">
+<div class="eyebrow">5. ENGINEERING RECORD</div><h2>What to document before submission</h2>
+<ul class="system-intro">
+<li>Motor/gearbox identification and encoder counts per wheel revolution.</li>
+<li>PWM step magnitude and the measured speed-versus-time log.</li>
+<li>How K and τ were fitted, including the P3 measured-data plot.</li>
+<li>Why the selected speed setpoint and damping ratio are suitable for the Micromouse.</li>
+<li>Final Kp, Ki, Kd, simulated response, and evidence that PWM remains between 0% and 100%.</li>
+</ul>
+</section>
+</main>
+<footer>ENCS4380 · Homework 2 · My System</footer>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+let generatedCode="";
+function crossing(t,y,v){for(let i=1;i<y.length;i++){if(y[i-1]<v&&y[i]>=v){const f=(v-y[i-1])/(y[i]-y[i-1]);return t[i-1]+f*(t[i]-t[i-1]);}}return null;}
+function simulate(K,tau,r,kp,ki){const dt=0.001,duration=Math.max(10,8*tau),n=Math.ceil(duration/dt),t=[],y=[],u=[];let speed=0,integral=0,peak=0;
+for(let i=0;i<=n;i++){const e=r-speed,trial=integral+e*dt,raw=kp*e+ki*trial;if((raw>=0&&raw<=100)||(raw>100&&e<0)||(raw<0&&e>0))integral=trial;const cmd=Math.max(0,Math.min(100,kp*e+ki*integral));t.push(i*dt);y.push(speed);u.push(cmd);peak=Math.max(peak,speed);if(i<n)speed+=dt*(K*cmd-speed)/tau;}
+const final=y.slice(-Math.max(1,Math.floor(y.length*.05))).reduce((a,b)=>a+b,0)/Math.max(1,Math.floor(y.length*.05));
+const t10=crossing(t,y,.1*final),t90=crossing(t,y,.9*final);
+let last=-1;for(let i=0;i<y.length;i++)if(Math.abs(y[i]-final)>.02*Math.max(Math.abs(final),1e-9))last=i;
+const stable=y.slice(-Math.floor(y.length*.05)).every(v=>Math.abs(v-final)<=.02*Math.max(Math.abs(final),1e-9));
+return {t,y,u,final,rise:t10===null||t90===null?null:t90-t10,os:Math.max(0,100*(peak-r)/r),settle:stable?(last<0?0:t[last+1]):null,error:100*Math.abs(r-final)/r,maxPWM:Math.max(...u)};}
+function draw(data,r){const c=$("systemChart"),ctx=c.getContext("2d"),w=Math.max(c.clientWidth,280),h=c.clientHeight||300,dpr=devicePixelRatio||1;c.width=w*dpr;c.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);const L=55,R=15,T=20,B=35,pw=w-L-R,ph=h-T-B,max=Math.max(r*1.15,...data.y)*1.08;const X=t=>L+t/data.t[data.t.length-1]*pw,Y=v=>T+ph-v/max*ph;ctx.font="11px Arial";ctx.strokeStyle="#30405a";ctx.fillStyle="#a8b8d1";for(let j=0;j<=4;j++){let yy=T+ph*j/4;ctx.beginPath();ctx.moveTo(L,yy);ctx.lineTo(w-R,yy);ctx.stroke();ctx.fillText((max*(1-j/4)).toFixed(0),8,yy+4);}ctx.setLineDash([6,5]);ctx.strokeStyle="#ffd36b";ctx.beginPath();ctx.moveTo(L,Y(r));ctx.lineTo(w-R,Y(r));ctx.stroke();ctx.setLineDash([]);ctx.strokeStyle="#43dbc1";ctx.lineWidth=2.5;ctx.beginPath();const stride=Math.max(1,Math.floor(data.t.length/1500));for(let i=0;i<data.t.length;i+=stride){if(i===0)ctx.moveTo(X(data.t[i]),Y(data.y[i]));else ctx.lineTo(X(data.t[i]),Y(data.y[i]));}ctx.lineTo(X(data.t.at(-1)),Y(data.y.at(-1)));ctx.stroke();ctx.fillStyle="#43dbc1";ctx.fillText("Motor speed",L,13);ctx.fillStyle="#ffd36b";ctx.fillText("Setpoint",L+100,13);ctx.fillStyle="#a8b8d1";ctx.fillText("Time (s)",w/2,h-6);}
+$("designBtn").addEventListener("click",()=>{const K=Number($("gainK").value),tau=Number($("timeTau").value),r=Number($("speedRef").value),z=Number($("damping").value);$("systemError").textContent="";if(!(K>0&&tau>0&&r>0&&Number.isFinite(K)&&Number.isFinite(tau)&&Number.isFinite(r))){$("systemError").textContent="Enter valid positive measured K, measured τ, and desired speed.";return;}const kp=1/K,ki=1/(z*z*tau*K),data=simulate(K,tau,r,kp,ki);$("designResults").hidden=$("responseSection").hidden=$("codeSection").hidden=false;$("outK").textContent=K.toFixed(4)+" rpm/%";$("outTau").textContent=tau.toFixed(4)+" s";$("outZeta").textContent=z.toFixed(2);$("outKp").textContent=kp.toFixed(5);$("outKi").textContent=ki.toFixed(5);const feasible=r/K<=100;$("feasibility").textContent=feasible?"The steady-state PWM estimate is "+(r/K).toFixed(1)+"%. This is within the 0–100% actuator range.":"Warning: the steady-state PWM estimate is "+(r/K).toFixed(1)+"%, above 100%. Reduce the speed setpoint or verify the measured motor gain."; $("feasibility").className="system-note "+(feasible?"system-success":"system-warning");draw(data,r);$("resultRise").textContent=data.rise===null?"Not reached":data.rise.toFixed(3)+" s";$("resultOS").textContent=data.os.toFixed(2)+"%";$("resultSettle").textContent=data.settle===null?"Not settled":data.settle.toFixed(3)+" s";$("resultError").textContent=data.error.toFixed(2)+"%";$("resultPWM").textContent=data.maxPWM.toFixed(1)+"%";$("specStatus").textContent=(data.settle===null?"Response did not settle during the simulated window. ":"Settling time was estimated from the simulated trace. ")+(data.maxPWM<=100.0001?"PWM remained within 0–100%.":"PWM limit was exceeded.");generatedCode=`// PI speed controller for the measured Micromouse motor
+// Plant: G(s) = K / (tau*s + 1)
+// Measured K = ${K.toFixed(6)} rpm/%PWM, tau = ${tau.toFixed(6)} s
+// Target damping ratio = ${z.toFixed(2)}
+
+const float Kp = ${kp.toFixed(6)};
+const float Ki = ${ki.toFixed(6)};
+const float Kd = 0.0;
+const float setpointRPM = ${r.toFixed(2)};
+const unsigned long sampleTimeMs = 10;
+const float Ts = sampleTimeMs / 1000.0;
+const float PWM_MIN = 0.0;
+const float PWM_MAX = 100.0;
+
+float integralError = 0.0;
+unsigned long previousTime = 0;
+
+void updateSpeedController(float measuredRPM) {
+  unsigned long now = millis();
+  if (now - previousTime < sampleTimeMs) return;
+  previousTime = now;
+
+  float error = setpointRPM - measuredRPM;
+  float candidateIntegral = integralError + error * Ts;
+  float candidatePWM = Kp * error + Ki * candidateIntegral;
+
+  // Conditional integration anti-windup
+  if ((candidatePWM >= PWM_MIN && candidatePWM <= PWM_MAX) ||
+      (candidatePWM > PWM_MAX && error < 0) ||
+      (candidatePWM < PWM_MIN && error > 0)) {
+    integralError = candidateIntegral;
+  }
+
+  float pwm = Kp * error + Ki * integralError;
+  pwm = constrain(pwm, PWM_MIN, PWM_MAX);
+  analogWrite(9, (int)round(pwm * 255.0 / 100.0));
+}`;
+$("arduinoCode").textContent=generatedCode;});
+$("copyCode").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(generatedCode);$("copyStatus").textContent="Code copied."; }catch(e){$("copyStatus").textContent="Copy is unavailable in this browser; select the code and copy it manually."; }});
+window.addEventListener("resize",()=>{if(!$("responseSection").hidden){const K=Number($("gainK").value),tau=Number($("timeTau").value),r=Number($("speedRef").value),z=Number($("damping").value);if(K>0&&tau>0&&r>0)draw(simulate(K,tau,r,1/K,1/(z*z*tau*K)),r);}});
+</script>
+</body></html>
