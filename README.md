@@ -150,11 +150,11 @@ G(s) = 25.59 / (s + 22.37)
      = 1.14394 / (0.04470 s + 1)
 ```
 
-The algebraic normalization yields K = 1.14394 in the source model's units and tau = 0.04470 s. **Do not label K as rpm per 1% PWM without verifying the paper's input and output scaling.** These are published reference values from another laboratory, not experimental measurements of our Micromouse. Our simulator's measured-K input remains empty until the source scaling is reconciled or our motor is tested.
+The source reports motor speed in RPM and a PWM command in integer counts; its characterization spans 0–254 counts. Thus K_count = 25.59/22.37 = 1.14394 RPM/count and tau = 1/22.37 = 0.04470 s. Assuming 254 counts corresponds to 100% duty, the converted gain is K = 1.14394 × 2.54 = 2.90561 RPM per 1% PWM. The reference dataset uses a TSINY TS-25GA370H-20, 12 V, nominal 300 RPM motor with encoder feedback. These are converted literature-reference parameters from another laboratory, not measurements of our Micromouse. The My System page pre-fills K = 2.90561, tau = 0.04470 s, and a 250 RPM reference target.
 
-**Specification rationale:** A target damping ratio of zeta = 0.7 is inside the requested 0.6–0.8 range, balancing response speed against overshoot. The PWM command must be constrained to 0–100% to respect the actuator range. The speed setpoint must be chosen from a feasible operating speed for the specific motor and verified against its steady-state PWM requirement; the displayed 300 rpm is an editable example, not a validated operating point.
+**Specification rationale:** A target damping ratio of zeta = 0.7 is inside the requested 0.6–0.8 range, balancing response speed against overshoot. PWM is constrained to 0–100%. The 250 RPM reference target is below the dataset motor's stated 300 RPM nominal speed; it is a literature-example operating point, not a validated target for our own robot.
 
-**Before final submission:** confirm that the instructor accepts published reference data in place of project-specific measurements, verify the model's units, document the operating setpoint, and rerun My System's simulation with consistent physical units.
+**Before final submission:** confirm that the instructor accepts published reference data in place of project-specific measurements. Clearly identify these parameters as literature-derived, not our own motor measurements. If the actual Micromouse motor differs, repeat the P3 encoder/PWM step test and replace the reference values.
 
 ### Homework 2 GitHub issues
 
