@@ -100,7 +100,44 @@ An interactive closed-loop PID controller playground provided as three separate,
 
 To use: open the PID page from the Homework 2 card on the home page, configure a plant and gains, then select **Run**. The original four Homework 1 modules remain unchanged.
 
-> Scope: The repository currently includes Homework 2 **P1 PID Playground** only; this does not imply that the other Homework 2 pages or bonus modules are completed.
+### P2: A slow sensor in the loop
+
+**[Open P2](https://batool2006bsharat-cyber.github.io/encs4380-dynamics-Jerry/pid-slow-sensor.html)**
+
+- First-order plant and first-order sensor in the feedback path.
+- Plots true plant output and measured sensor output together.
+- PID controller acts on the sensor reading, with actuator saturation and anti-windup.
+- Compares true and measured overshoot, settling behaviour, and Routh–Hurwitz stability prediction.
+
+### P3: Digital PID
+
+**[Open P3](https://batool2006bsharat-cyber.github.io/encs4380-dynamics-Jerry/pid-digital.html)**
+
+- Discrete PID with adjustable sampling time, anti-windup, and held control signal.
+- First-order, second-order, and Micromouse motor modes.
+- Generates Arduino code for the selected model and gains.
+- Includes a Micromouse PWM step-test sketch and log fitter to estimate motor K and τ from encoder speed data.
+
+### P4: Tuning challenge
+
+**[Open P4](https://batool2006bsharat-cyber.github.io/encs4380-dynamics-Jerry/pid-tuning-challenge.html)**
+
+- Random hidden first- or second-order plant.
+- Tune PID gains against overshoot ≤ 10%, settling time ≤ 3 s, and steady-state error ≤ 1%.
+- Shows pass/fail per requirement, a score, and the hidden plant after testing.
+
+### My System: Micromouse drive motor
+
+**[Open My System](https://batool2006bsharat-cyber.github.io/encs4380-dynamics-Jerry/my-system.html)**
+
+- Enter the measured motor gain K (rpm per % PWM) and time constant τ from the P3 encoder/PWM step test.
+- Select a target damping ratio between 0.6 and 0.8.
+- Calculates a PI design using Kp = 1/K and Ki = 1/(ζ²τK), simulates the motor speed loop with a 0–100% PWM limit, and generates the PI controller core.
+- The page intentionally has no invented motor measurements. The example motor values in P3 are placeholders until replaced by the group's measured data.
+
+P1's rise time is measured from 10% to 90% of the estimated final output, and settling time is measured within ±2% of that final output. Steady-state error is reported separately against the requested setpoint; this correctly distinguishes a settled P-only response from its nonzero tracking error.
+
+The original Homework 1 modules remain part of the same site and repository. Homework 2 extends them rather than replacing them.
 
 ## 📸 Screenshots
 
