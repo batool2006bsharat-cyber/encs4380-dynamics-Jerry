@@ -29,7 +29,7 @@ Works on desktop and phone. No server, login or installation needed.
 | `index.html` | Home page: links to the four modules and all six validation checks |
 | `module1.html` | First-order time response |
 | `module2.html` | First-order frequency response |
-| `module3.html` | Second-order response and state-space panel |
+| `Module3.html` | Second-order response and state-space panel |
 | `module4.html` | "Guess the sensor" challenge |
 
 ### Module 1: First-order time response (thermometer)
@@ -130,10 +130,11 @@ To use: open the PID page from the Homework 2 card on the home page, configure a
 
 **[Open My System](https://batool2006bsharat-cyber.github.io/encs4380-dynamics-Jerry/my-system.html)**
 
-- Enter the measured motor gain K (rpm per % PWM) and time constant τ from the P3 encoder/PWM step test.
-- Select a target damping ratio between 0.6 and 0.8.
-- Calculates a PI design using Kp = 1/K and Ki = 1/(ζ²τK), simulates the motor speed loop with a 0–100% PWM limit, and generates the PI controller core.
-- The page intentionally has no invented motor measurements. The example motor values in P3 are placeholders until replaced by the group's measured data.
+- Uses a clearly labelled published reference DC motor model from the cited 2026 *Data in Brief* article and its Mendeley experimental dataset; it is not presented as a measurement of our Micromouse.
+- Prefills the converted reference parameters K = 2.90561 RPM per 1% PWM and τ = 0.04470 s, with the PWM-count conversion and its assumption documented.
+- Uses a 250 RPM reference operating target and a selectable damping ratio between 0.6 and 0.8.
+- Calculates PI gains, simulates the speed loop with a 0–100% PWM limit, reports response metrics, and generates the PI controller core.
+- If the team's actual motor is later identified/tested, replace the literature reference values with that motor's measured parameters.
 
 P1's rise time is measured from 10% to 90% of the estimated final output, and settling time is measured within ±2% of that final output. Steady-state error is reported separately against the requested setpoint; this correctly distinguishes a settled P-only response from its nonzero tracking error.
 
@@ -162,12 +163,12 @@ The article identifies the output MEAS in RPM and records the applied PWM input 
 
 | Module | Issue | Owner |
 |---|---|---|
-| P1 — PID Playground | [#2](https://github.com/batool2006bsharat-cyber/encs4380-dynamics-Jerry/issues/2) | Assign the agreed P1 owner |
+| P1 — PID Playground | [#2](https://github.com/batool2006bsharat-cyber/encs4380-dynamics-Jerry/issues/2) | batool2006bsharat-cyber |
 | P2 — Slow sensor | [#1](https://github.com/batool2006bsharat-cyber/encs4380-dynamics-Jerry/issues/1) | basamatyasin |
-| P3 — Digital PID | [#4](https://github.com/batool2006bsharat-cyber/encs4380-dynamics-Jerry/issues/4) | Assign the agreed P3 owner |
-| P4 — Tuning challenge | [#5](https://github.com/batool2006bsharat-cyber/encs4380-dynamics-Jerry/issues/5) | Assign the agreed P4 owner |
+| P3 — Digital PID | [#4](https://github.com/batool2006bsharat-cyber/encs4380-dynamics-Jerry/issues/4) | HalaQunir |
+| P4 — Tuning challenge | [#5](https://github.com/batool2006bsharat-cyber/encs4380-dynamics-Jerry/issues/5) | niveenantari |
 
-Assign P1, P3 and P4 to the actual group members responsible for those modules before submission.
+The issue owners above follow the original module commits in the repository history.
 
 ## 📸 Screenshots
 
