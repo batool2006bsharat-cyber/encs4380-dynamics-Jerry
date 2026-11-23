@@ -9,41 +9,46 @@ body {
   font-family: "Segoe UI", Arial, sans-serif;
   margin: 0;
   padding: 30px 12px;
-  color: #4a2740;
-  background: linear-gradient(160deg, #fff0f6, #f3e8ff);
+  color: #eef4ff;
+  background: #090f1e;
   min-height: 100vh;
 }
 
 .container {
   max-width: 1000px;
   margin: auto;
-  background-color: white;
+  background-color: #131d30;
   padding: 25px;
   border-radius: 22px;
-  box-shadow: 0 10px 30px rgba(226, 84, 143, 0.18);
+  box-shadow: none;
+  border: 1px solid #2a3a53;
 }
 
 h1 {
-  color: #e2548f;
+  color: #eef4ff;
   margin-top: 0;
 }
 
 h2 {
-  color: #8f6fdc;
+  color: #eef4ff;
 }
 
 h3 {
   margin-top: 0;
-  color: #c13b74;
+  color: #eef4ff;
 }
 
 a {
-  color: #c13b74;
+  color: #43dbc1;
+}
+
+p {
+  color: #a8b8d1;
 }
 
 .crumbs {
   font-size: 0.9rem;
-  color: #8a6a80;
+  color: #a8b8d1;
   margin: 0 0 8px;
 }
 
@@ -58,17 +63,17 @@ label {
 input[type="range"] {
   width: 260px;
   max-width: 60%;
-  accent-color: #e2548f;
+  accent-color: #729dff;
   vertical-align: middle;
 }
 
 .value {
   font-weight: bold;
-  color: #e2548f;
+  color: #729dff;
 }
 
 .infoBox {
-  background-color: #f3e8ff;
+  background-color: #1b2940;
   padding: 15px;
   margin-top: 15px;
   border-radius: 14px;
@@ -76,22 +81,22 @@ input[type="range"] {
 }
 
 .predictBox {
-  background-color: #ffe9f2;
-  border: 2px dashed #f7b6d2;
+  background-color: #1b2940;
+  border: 2px dashed #43dbc1;
   padding: 15px;
   margin-top: 25px;
   border-radius: 14px;
 }
 
 .calcBox {
-  background-color: #fff3ea;
+  background-color: #1b2940;
   padding: 15px;
   margin-top: 25px;
   border-radius: 14px;
 }
 
 .validationBox {
-  background-color: #e9f8f2;
+  background-color: #1b2940;
   padding: 15px;
   margin-top: 25px;
   border-radius: 14px;
@@ -103,25 +108,25 @@ button {
   margin-top: 10px;
   border: none;
   border-radius: 999px;
-  background-color: #e2548f;
-  color: white;
+  background-color: #729dff;
+  color: #0c1930;
   font-weight: bold;
   font-family: inherit;
 }
 
 button:hover {
-  background-color: #c13b74;
+  background-color: #43dbc1;
 }
 
 input[type="text"],
 input[type="number"],
 select {
   padding: 7px;
-  border: 2px solid #f0d4e3;
+  border: 2px solid #2a3a53;
   border-radius: 10px;
   font-family: inherit;
-  color: #4a2740;
-  background: white;
+  color: #eef4ff;
+  background: #1b2940;
 }
 
 input[type="text"] {
@@ -145,29 +150,29 @@ table {
 
 th,
 td {
-  border: 1px solid #f0d4e3;
+  border: 1px solid #2a3a53;
   padding: 10px;
   text-align: center;
 }
 
 th {
-  background-color: #ffe3ef;
+  background-color: #1b2940;
 }
 
 .pass {
-  color: #1d7a5f;
+  color: #43dbc1;
   font-weight: bold;
 }
 
 .fail {
-  color: #b3263f;
+  color: #ff7b8d;
   font-weight: bold;
 }
 
 footer {
   margin-top: 30px;
   font-size: 0.85rem;
-  color: #8a6a80;
+  color: #a8b8d1;
   text-align: center;
 }
 
@@ -194,7 +199,7 @@ footer {
 }
 
 .formulaBox {
-  background: #f3e8ff;
+  background: #1b2940;
   border-radius: 14px;
   padding: 12px 16px;
   margin: 14px 0 20px;
@@ -217,8 +222,8 @@ footer {
 }
 
 .controls {
-  background: #fffafc;
-  border: 1px solid #f0d4e3;
+  background: #131d30;
+  border: 1px solid #2a3a53;
   border-radius: 14px;
   padding: 16px;
 }
@@ -245,7 +250,7 @@ footer {
 }
 
 .slider output {
-  color: #e2548f;
+  color: #729dff;
   font-weight: bold;
   white-space: nowrap;
 }
@@ -266,14 +271,14 @@ footer {
 .seg button {
   flex: 1 1 auto;
   margin: 0;
-  background: #ffe9f2;
-  color: #c13b74;
+  background: #1b2940;
+  color: #43dbc1;
   padding: 7px 6px;
   font-size: 0.9rem;
 }
 
 .motorNote {
-  background: #f3e8ff;
+  background: #1b2940;
   border-radius: 12px;
   padding: 8px 10px;
   font-size: 0.85rem;
@@ -286,7 +291,7 @@ footer {
 
 /* ---------- Micromouse section ---------- */
 .motorSection {
-  background: #fff3ea;
+  background: #1b2940;
   border-radius: 14px;
   padding: 16px 18px;
 }
@@ -316,14 +321,14 @@ textarea#logIn {
   width: 100%;
   min-height: 120px;
   padding: 10px;
-  border: 2px solid #f0d4e3;
+  border: 2px solid #2a3a53;
   border-radius: 12px;
   font:
     13px/1.4 Consolas,
     "Courier New",
     monospace;
-  color: #4a2740;
-  background: white;
+  color: #eef4ff;
+  background: #1b2940;
   resize: vertical;
 }
 
@@ -350,8 +355,8 @@ textarea#logIn {
 }
 
 .seg button[aria-pressed="true"] {
-  background: #e2548f;
-  color: white;
+  background: #729dff;
+  color: #0c1930;
 }
 
 .checks {
@@ -370,21 +375,21 @@ textarea#logIn {
 }
 
 .checks input {
-  accent-color: #e2548f;
+  accent-color: #729dff;
   width: 16px;
   height: 16px;
   flex-shrink: 0;
 }
 
 .awRow {
-  background: #ffe9f2;
-  border: 2px dashed #f7b6d2;
+  background: #1b2940;
+  border: 2px dashed #43dbc1;
   border-radius: 12px;
   padding: 8px 10px;
 }
 
 .warn {
-  background: #fff3ea;
+  background: #1b2940;
   border-radius: 12px;
   padding: 8px 10px;
   font-size: 0.88rem;
@@ -396,8 +401,8 @@ textarea#logIn {
 }
 
 .plotBox {
-  background: white;
-  border: 1px solid #f0d4e3;
+  background: #1b2940;
+  border: 1px solid #2a3a53;
   border-radius: 14px;
   padding: 8px;
   margin-bottom: 14px;
@@ -431,18 +436,18 @@ textarea#logIn {
 }
 
 .verdict.good {
-  background: #e9f8f2;
-  color: #1d7a5f;
+  background: #1b2940;
+  color: #43dbc1;
 }
 
 .verdict.meh {
-  background: #fff3ea;
-  color: #9a5317;
+  background: #1b2940;
+  color: #ffd36b;
 }
 
 .verdict.bad {
-  background: #ffe3ef;
-  color: #b3263f;
+  background: #1b2940;
+  color: #ff7b8d;
 }
 
 section {
@@ -450,7 +455,7 @@ section {
 }
 
 .note {
-  color: #8a6a80;
+  color: #a8b8d1;
   font-size: 0.9rem;
   margin: 6px 0 0;
 }
@@ -459,11 +464,12 @@ section {
 .quizTop {
   display: flex;
   justify-content: space-between;
-  color: #8a6a80;
+  color: #a8b8d1;
   font-size: 0.9rem;
 }
 
 .quizQ {
+  color: #eef4ff;
   font-weight: bold;
   margin: 8px 0 12px;
 }
@@ -479,8 +485,8 @@ section {
   gap: 10px;
   align-items: flex-start;
   font-weight: normal;
-  background: white;
-  border: 2px solid #f0d4e3;
+  background: #1b2940;
+  border: 2px solid #2a3a53;
   border-radius: 12px;
   padding: 9px 12px;
   cursor: pointer;
@@ -488,17 +494,17 @@ section {
 
 .quizOpts input {
   margin-top: 4px;
-  accent-color: #e2548f;
+  accent-color: #729dff;
 }
 
 .quizOpts label.right {
-  border-color: #1d7a5f;
-  background: #e9f8f2;
+  border-color: #43dbc1;
+  background: #1b2940;
 }
 
 .quizOpts label.wrong {
-  border-color: #b3263f;
-  background: #ffe3ef;
+  border-color: #ff7b8d;
+  background: #1b2940;
 }
 
 .quizButtons {
@@ -513,17 +519,17 @@ button:disabled {
 }
 
 button:disabled:hover {
-  background-color: #e2548f;
+  background-color: #729dff;
 }
 
 button.secondary {
-  background: white;
-  color: #c13b74;
-  border: 2px solid #f7b6d2;
+  background: #1b2940;
+  color: #43dbc1;
+  border: 2px solid #43dbc1;
 }
 
 button.secondary:hover {
-  background: #fff0f6;
+  background: #24344f;
 }
 
 #quizExplain {
@@ -548,8 +554,8 @@ button.secondary:hover {
 }
 
 pre.code {
-  background: #2b1d2a;
-  color: #fbeaf3;
+  background: #0c1526;
+  color: #eef4ff;
   border-radius: 14px;
   padding: 14px 16px;
   margin: 10px 0 0;
@@ -562,12 +568,12 @@ pre.code {
 }
 
 pre.code .c {
-  color: #c9a6bd;
+  color: #7f93b3;
 }
 
 #copyMsg,
 .copyMsg {
-  color: #1d7a5f;
+  color: #43dbc1;
   font-weight: bold;
   font-size: 0.9rem;
 }
