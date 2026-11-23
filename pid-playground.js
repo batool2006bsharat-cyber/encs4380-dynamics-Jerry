@@ -202,52 +202,61 @@ function metrics(data, target) {
   const n = output.length;
 
   let peak = -Infinity;
+  for (const value of output) {
+    if (value > peak) peak = value;
+  }
+
+  // Estimate the actual final value from the last 5% of the response.
+  // This matters for P-only control: the output can settle below the setpoint.
+  const tailStart = Math.floor(n * 0.95);
+  const tail = output.slice(tailStart);
+  const finalValue =
+    tail.reduce((sum, value) => sum + value, 0) / tail.length;
+
+  // Rise time is measured from 10% to 90% of the final output,
+  // not 10% to 90% of the requested setpoint.
+  const ten = thresholdCross(time, output, 0.1 * finalValue);
+  const ninety = thresholdCross(time, output, 0.9 * finalValue);
+  const rise =
+    ten === null || ninety === null ? null : ninety - ten;
+
+  // Settling time is the last time the response leaves the +/-2% band
+  // around its actual final value. Separately check that the tail is stable,
+  // so a sustained oscillation is not incorrectly marked as settled.
+  const tolerance = 0.02 * Math.max(
+    Math.abs(finalValue),
+    Math.abs(target) * 1e-6
+  );
+  const tailStable = tail.every(
+    value => Math.abs(value - finalValue) <= tolerance
+  );
+
   let lastOutside = -1;
-
   for (let i = 0; i < n; i++) {
-    if (output[i] > peak) {
-      peak = output[i];
-    }
-
-    if (
-      Math.abs(output[i] - target) >
-      0.02 * target
-    ) {
+    if (Math.abs(output[i] - finalValue) > tolerance) {
       lastOutside = i;
     }
   }
 
-  const ten = thresholdCross(
-    time, output, 0.1 * target
-  );
-
-  const ninety = thresholdCross(
-    time, output, 0.9 * target
-  );
-
-  const rise =
-    ten === null || ninety === null
-      ? null
-      : ninety - ten;
-
-  const settle =
-    lastOutside === n - 1
-      ? null
-      : lastOutside < 0
-        ? 0
+  const settle = !tailStable
+    ? null
+    : lastOutside < 0
+      ? 0
+      : lastOutside === n - 1
+        ? null
         : time[lastOutside + 1];
 
+  // Steady-state error is always referenced to the requested setpoint.
   const finalError =
-    100 * Math.abs(target - output[n - 1]) / target;
+    100 * Math.abs(target - finalValue) / Math.abs(target);
 
   return {
     rise,
-    overshoot: Math.max(
-      0,
-      100 * (peak - target) / target
-    ),
+    overshoot: Math.max(0, 100 * (peak - target) / Math.abs(target)),
     settle,
-    finalError
+    finalError,
+    finalValue,
+    tailStable
   };
 }
 
