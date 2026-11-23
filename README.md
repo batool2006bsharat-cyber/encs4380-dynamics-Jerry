@@ -168,7 +168,7 @@ Assign P1, P3 and P4 to the actual group members responsible for those modules b
 
 - Plain HTML, CSS and JavaScript, hosted as a static site on GitHub Pages.
 - Plots use [Plotly.js](https://plotly.com/javascript/) 2.35.2, loaded from its CDN.
-- All responses are the closed-form solutions from the lecture slides, computed live in the browser.
+- Homework 1 analytical responses are computed from the lecture models. Homework 2 closed-loop control responses are simulated numerically in time (Euler or RK4, depending on the module).
 - To run locally, open `index.html` in a browser (an internet connection is needed to load Plotly).
 
 ## 🤖 AI use
