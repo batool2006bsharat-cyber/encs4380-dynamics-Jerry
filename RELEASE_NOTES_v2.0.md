@@ -30,6 +30,6 @@ Dataset: https://data.mendeley.com/datasets/5xvg43r9r8/2
 
 ## Final checklist
 1. Keep the published motor parameters clearly labelled as external reference data, not team measurements.
-2. Complete P4 manual verification.
+2. P4 manual functional check completed; the team should retain its screenshots as submission evidence.
 3. Confirm the final live GitHub Pages deployment and screenshots.
 4. Confirm each team member's actual Homework 2 ownership and contribution record.
