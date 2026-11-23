@@ -19,8 +19,14 @@ Dataset: https://data.mendeley.com/datasets/5xvg43r9r8/2
 - P1: 3/3 validation checks passed (team-provided screenshot).
 - P2: 4/4 validation checks passed (team-provided screenshot).
 - P3: 4/4 validation checks passed (team-provided screenshot).
-- P4: final hands-on verification remains with the team.
-- My System: reference-model simulation screenshot recorded by the team; not hardware validation.
+- P4: functional hands-on test completed by the team; default gains correctly produce a 40/100 score with overshoot passing and settling-time / steady-state-error failing, and Reveal exposes the hidden first-order plant (K = 0.892, tau = 1.076 s).
+- My System: reference-model simulation completed (rise time 0.063 s, overshoot 3.21%, settling time 0.164 s, steady-state error 0.00%, maximum PWM 100%); this is simulation evidence, not hardware validation.
+
+## Homework 2 issue ownership
+- P1: batool2006bsharat-cyber — https://github.com/batool2006bsharat-cyber/encs4380-dynamics-Jerry/issues/2
+- P2: basamatyasin — https://github.com/batool2006bsharat-cyber/encs4380-dynamics-Jerry/issues/1
+- P3: HalaQunir — https://github.com/batool2006bsharat-cyber/encs4380-dynamics-Jerry/issues/4
+- P4: niveenantari — https://github.com/batool2006bsharat-cyber/encs4380-dynamics-Jerry/issues/5
 
 ## Final checklist
 1. Keep the published motor parameters clearly labelled as external reference data, not team measurements.
