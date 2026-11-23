@@ -4,21 +4,21 @@
    Colors and plot style (same palette as the rest of the toolkit)
  */
 
-const ROSE = "#e2548f";
-const LILAC = "#8f6fdc";
-const MINT = "#4fb89a";
-const ORANGE = "#e08a4f";
-const GREY = "#b9a3b3";
-const RED = "#b3263f";
+const ROSE = "#729dff";
+const LILAC = "#43dbc1";
+const MINT = "#ffd36b";
+const ORANGE = "#ffb86b";
+const GREY = "#a8b8d1";
+const RED = "#ff7b8d";
 
 function layoutFor(title, xTitle, yTitle) {
   return {
-    title: { text: title, font: { size: 14 } },
-    xaxis: { title: { text: xTitle }, gridcolor: "#f5dce8", zerolinecolor: "#e9c9da" },
-    yaxis: { title: { text: yTitle }, gridcolor: "#f5dce8", zerolinecolor: "#e9c9da" },
+    title: { text: title, font: { size: 14, color: "#eef4ff" } },
+    xaxis: { title: { text: xTitle }, gridcolor: "#30405a", zerolinecolor: "#3d4f6b" },
+    yaxis: { title: { text: yTitle }, gridcolor: "#30405a", zerolinecolor: "#3d4f6b" },
     paper_bgcolor: "rgba(0,0,0,0)",
-    plot_bgcolor: "#fffafc",
-    font: { color: "#4a2740", family: "Segoe UI, Arial, sans-serif", size: 12 },
+    plot_bgcolor: "rgba(0,0,0,0)",
+    font: { color: "#a8b8d1", family: "Segoe UI, Arial, sans-serif", size: 12 },
     legend: { orientation: "h", y: -0.28 },
     margin: { t: 40, r: 20, b: 70, l: 58 },
     hovermode: "closest",
@@ -1374,7 +1374,7 @@ const quizQuestions = [
     options: ["stay the same: the gains did not change", "grow", "shrink"],
     correct: 1,
     explain:
-      "Between samples the controller is blind and keeps sending an old value of u. A longer Ts means the loop reacts later, which acts like a delay in the loop, and delay adds overshoot: here it goes from about 1 % to about 38 %. Watch the pink curve pull away from the dotted continuous one.",
+      "Between samples the controller is blind and keeps sending an old value of u. A longer Ts means the loop reacts later, which acts like a delay in the loop, and delay adds overshoot: here it goes from about 1 % to about 38 %. Watch the blue curve pull away from the dotted continuous one.",
     start: Object.assign({}, base, { Ts: 0.02 }),
     end: { Ts: 0.25 },
   },
