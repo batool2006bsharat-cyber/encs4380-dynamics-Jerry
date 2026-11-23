@@ -213,9 +213,11 @@
         </div>
       </div>
       <p class="note">
-        *Last-sample error estimates steady-state error only
-        when the output has converged. Unsettled trajectories
-        are marked accordingly.
+        Rise time is measured from 10% to 90% of the estimated final output.
+        Settling time is the time to remain within ±2% of that final output.
+        Final error is measured separately against the requested setpoint.
+        This distinction matters for P-only control, where the output can settle
+        below the setpoint.
       </p>
     </section>
 
