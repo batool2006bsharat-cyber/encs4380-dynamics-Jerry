@@ -13,12 +13,12 @@ Works on desktop and phone. No server, login or installation needed.
 
 ## 👥 Team: Jerry
 
-| Member | Student ID | Module | GitHub Issue |
+| Member | Student ID | Homework 1 module |
 |---|---|---|---|
-|  Batool Bsharat | 1230049 | Module 1: First-order time response | #1 |
-|  Hala Qunir     | 1231745 | Module 2: First-order frequency response | #2 |
-|  Basamat Yasin  |  | Module 3: Second-order response | #3 |
-|  Niveen Antari  | 1232976 | Module 4: Guess the sensor | #4 |
+| Batool Bsharat | 1230049 | Module 1: First-order time response |
+| Hala Qunir | 1231745 | Module 2: First-order frequency response |
+| Basamat Yasin | — | Module 3: Second-order response |
+| Niveen Antari | 1232976 | Module 4: Guess the sensor |
 
 ## 📦 Homework 1 — Dynamic Characteristics
 
@@ -138,6 +138,17 @@ To use: open the PID page from the Homework 2 card on the home page, configure a
 P1's rise time is measured from 10% to 90% of the estimated final output, and settling time is measured within ±2% of that final output. Steady-state error is reported separately against the requested setpoint; this correctly distinguishes a settled P-only response from its nonzero tracking error.
 
 The original Homework 1 modules remain part of the same site and repository. Homework 2 extends them rather than replacing them.
+
+### Homework 2 GitHub issues
+
+| Module | Issue | Owner |
+|---|---|---|
+| P1 — PID Playground | [#2](https://github.com/batool2006bsharat-cyber/encs4380-dynamics-Jerry/issues/2) | Assign the agreed P1 owner |
+| P2 — Slow sensor | [#1](https://github.com/batool2006bsharat-cyber/encs4380-dynamics-Jerry/issues/1) | basamatyasin |
+| P3 — Digital PID | [#4](https://github.com/batool2006bsharat-cyber/encs4380-dynamics-Jerry/issues/4) | Assign the agreed P3 owner |
+| P4 — Tuning challenge | [#5](https://github.com/batool2006bsharat-cyber/encs4380-dynamics-Jerry/issues/5) | Assign the agreed P4 owner |
+
+Assign P1, P3 and P4 to the actual group members responsible for those modules before submission.
 
 ## 📸 Screenshots
 
