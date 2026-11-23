@@ -140,8 +140,6 @@ P1's rise time is measured from 10% to 90% of the estimated final output, and se
 
 The original Homework 1 modules remain part of the same site and repository. Homework 2 extends them rather than replacing them.
 
-**Contribution audit:** the repository history contains commits from all four team GitHub accounts (batool2006bsharat-cyber, HalaQunir, basamatyasin, and niveenantari). This confirms activity from each account in the repository history; it does not by itself prove the exact division of Homework 2 work. Confirm the member-to-module allocation with the team before submission.
-
 ### Published motor reference and limitations
 
 For the My System literature reference, we use the peer-reviewed 2026 *Data in Brief* article **Experimental data from an open-source DC motor control educational kit for calibration, system identification, and controller validation** and its [Mendeley dataset](https://data.mendeley.com/datasets/5xvg43r9r8/2).
