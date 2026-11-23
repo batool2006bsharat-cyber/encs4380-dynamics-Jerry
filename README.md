@@ -139,6 +139,23 @@ P1's rise time is measured from 10% to 90% of the estimated final output, and se
 
 The original Homework 1 modules remain part of the same site and repository. Homework 2 extends them rather than replacing them.
 
+### Published motor reference and limitations
+
+For the My System literature reference, we use the peer-reviewed 2026 *Data in Brief* article **Experimental data from an open-source DC motor control educational kit for calibration, system identification, and controller validation** and its [Mendeley dataset](https://data.mendeley.com/datasets/5xvg43r9r8/2).
+
+The reported 20 ms case has the transfer function
+
+```text
+G(s) = 25.59 / (s + 22.37)
+     = 1.14394 / (0.04470 s + 1)
+```
+
+The algebraic normalization yields K = 1.14394 in the source model's units and tau = 0.04470 s. **Do not label K as rpm per 1% PWM without verifying the paper's input and output scaling.** These are published reference values from another laboratory, not experimental measurements of our Micromouse. Our simulator's measured-K input remains empty until the source scaling is reconciled or our motor is tested.
+
+**Specification rationale:** A target damping ratio of zeta = 0.7 is inside the requested 0.6–0.8 range, balancing response speed against overshoot. The PWM command must be constrained to 0–100% to respect the actuator range. The speed setpoint must be chosen from a feasible operating speed for the specific motor and verified against its steady-state PWM requirement; the displayed 300 rpm is an editable example, not a validated operating point.
+
+**Before final submission:** confirm that the instructor accepts published reference data in place of project-specific measurements, verify the model's units, document the operating setpoint, and rerun My System's simulation with consistent physical units.
+
 ### Homework 2 GitHub issues
 
 | Module | Issue | Owner |
