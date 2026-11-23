@@ -359,7 +359,7 @@ const rows = [];
 document.getElementById("valBody").innerHTML = rows.map(([name, exp, got, pass, mod]) => `
   <tr><td>${name}</td><td>${exp}</td><td class="num">${got}</td>
   <td class="${pass ? "pass" : "fail"}">${pass ? "PASS ✓" : "FAIL ✗"}</td>
-  <td><a href="module${mod}.html">Module ${mod}</a></td></tr>`).join("");
+  <td><a href="${mod === 3 ? "Module3" : "module" + mod}.html">Module ${mod}</a></td></tr>`).join("");
 </script>
 
 </body>
