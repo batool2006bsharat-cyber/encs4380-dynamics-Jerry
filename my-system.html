@@ -30,7 +30,7 @@
 <div><label for="speedRef">Reference speed target (rpm)</label><input id="speedRef" type="number" min="1" step="1" value="250"></div>
 <div><label for="damping">Target damping ratio ζ</label><select id="damping"><option value="0.6">0.6</option><option value="0.7" selected>0.7 (recommended target)</option><option value="0.8">0.8</option></select></div>
 </div>
-<div class="system-note"><strong>Where do K and τ come from?</strong><br>Run the PWM step-test sketch in P3 with the drive wheels safely lifted. Record encoder-derived wheel speed, paste the Serial Monitor log into P3, and use its fitted K and τ. Record the test PWM step, encoder counts per wheel revolution, date, and which motor was tested in your report/README.</div>
+<div class="system-note"><strong>Current values: published reference model.</strong><br>The prefilled K and τ are converted from the cited OpenMCT dataset model; they are not measured on our Micromouse. If the instructor requires project-specific measurements, run the P3 PWM step test with the actual drive motor and replace both reference values with the fitted results. Record PWM step, encoder counts per wheel revolution, date, and motor identification.</div>
 <div class="actions"><button id="designBtn" type="button">Calculate my controller</button><a class="home-link" href="pid-digital.html">Open P3 step test & Arduino generator →</a></div>
 <p id="systemError" class="error" role="alert"></p>
 </section>
