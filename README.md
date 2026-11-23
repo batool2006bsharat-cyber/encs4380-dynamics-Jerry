@@ -139,22 +139,24 @@ P1's rise time is measured from 10% to 90% of the estimated final output, and se
 
 The original Homework 1 modules remain part of the same site and repository. Homework 2 extends them rather than replacing them.
 
+**Contribution audit:** the repository history contains commits from all four team GitHub accounts (batool2006bsharat-cyber, HalaQunir, basamatyasin, and niveenantari). This confirms activity from each account in the repository history; it does not by itself prove the exact division of Homework 2 work. Confirm the member-to-module allocation with the team before submission.
+
 ### Published motor reference and limitations
 
 For the My System literature reference, we use the peer-reviewed 2026 *Data in Brief* article **Experimental data from an open-source DC motor control educational kit for calibration, system identification, and controller validation** and its [Mendeley dataset](https://data.mendeley.com/datasets/5xvg43r9r8/2).
 
-The reported 20 ms case has the transfer function
+The 20 ms plant-identification / controller-validation case in Table 6 is:
 
 ```text
 G(s) = 25.59 / (s + 22.37)
      = 1.14394 / (0.04470 s + 1)
 ```
 
-The source reports motor speed in RPM and a PWM command in integer counts; its characterization spans 0–254 counts. Thus K_count = 25.59/22.37 = 1.14394 RPM/count and tau = 1/22.37 = 0.04470 s. Assuming 254 counts corresponds to 100% duty, the converted gain is K = 1.14394 × 2.54 = 2.90561 RPM per 1% PWM. The reference dataset uses a TSINY TS-25GA370H-20, 12 V, nominal 300 RPM motor with encoder feedback. These are converted literature-reference parameters from another laboratory, not measurements of our Micromouse. The My System page pre-fills K = 2.90561, tau = 0.04470 s, and a 250 RPM reference target.
+The article identifies the output MEAS in RPM and records the applied PWM input as integer command counts. Its static characterization explicitly sweeps the command from 0 to 254 counts. With the 8-bit command span treated as 0–100% duty, the source-model gain is K_count = 25.59/22.37 = 1.14394 RPM/count; the equivalent percent-duty gain is K = 1.14394 × 254/100 = 2.90561 RPM per 1% PWM. The time constant is tau = 1/22.37 = 0.04470 s. The dataset hardware is a TSINY TS-25GA370H-20, 12 V, nominal 300 RPM brushed DC motor with encoder feedback, DRV8874 driver, and Teensy 4.0. These are converted literature-reference parameters from another laboratory, NOT measurements of our Micromouse. Sources: [article, DOI 10.1016/j.dib.2026.113274](https://doi.org/10.1016/j.dib.2026.113274), [PubMed record](https://pubmed.ncbi.nlm.nih.gov/42835008/), and [Mendeley experimental dataset, DOI 10.17632/5xvg43r9r8.2](https://data.mendeley.com/datasets/5xvg43r9r8/2). The My System page pre-fills K = 2.90561, tau = 0.04470 s, and a 250 RPM reference target.
 
-**Specification rationale:** A target damping ratio of zeta = 0.7 is inside the requested 0.6–0.8 range, balancing response speed against overshoot. PWM is constrained to 0–100%. The 250 RPM reference target is below the dataset motor's stated 300 RPM nominal speed; it is a literature-example operating point, not a validated target for our own robot.
+**Specification rationale:** A target damping ratio of zeta = 0.7 is within the instructor's requested 0.6–0.8 range and is a midpoint design choice. PWM is constrained to 0–100%. The 250 RPM reference target is below the source motor's nominal 300 RPM; at the converted model gain it requires about 86.0% steady-state PWM. This is an illustrative reference operating point, not a validated target for our own robot.
 
-**Before final submission:** confirm that the instructor accepts published reference data in place of project-specific measurements. Clearly identify these parameters as literature-derived, not our own motor measurements. If the actual Micromouse motor differs, repeat the P3 encoder/PWM step test and replace the reference values.
+**Instructor approval is still required:** this source is a peer-reviewed, open-access experimental dataset, but it describes a different motor/driver platform. The team must ask whether a literature-derived reference model is acceptable instead of measurements from its own Micromouse. If not accepted, use the P3 encoder/PWM step test on the actual robot and replace K and tau.
 
 ### Homework 2 GitHub issues
 
