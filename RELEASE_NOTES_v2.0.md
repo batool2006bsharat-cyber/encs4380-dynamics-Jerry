@@ -22,9 +22,8 @@ Dataset: https://data.mendeley.com/datasets/5xvg43r9r8/2
 - P4: final hands-on verification remains with the team.
 - My System: reference-model simulation screenshot recorded by the team; not hardware validation.
 
-## Before publishing this release
-1. Obtain instructor approval for using a published reference model instead of measurements from the team's own Micromouse.
-2. If required, replace reference parameters with the team's encoder/PWM step-test values.
-3. Complete P4 manual verification.
-4. Confirm the final live GitHub Pages deployment and screenshots.
-5. Confirm each team member's actual Homework 2 ownership and contribution record.
+## Final checklist
+1. Keep the published motor parameters clearly labelled as external reference data, not team measurements.
+2. Complete P4 manual verification.
+3. Confirm the final live GitHub Pages deployment and screenshots.
+4. Confirm each team member's actual Homework 2 ownership and contribution record.
