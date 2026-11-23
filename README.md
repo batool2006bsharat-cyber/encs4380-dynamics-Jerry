@@ -156,9 +156,7 @@ The article identifies the output MEAS in RPM and records the applied PWM input 
 
 **Specification rationale:** A target damping ratio of zeta = 0.7 is within the instructor's requested 0.6–0.8 range and is a midpoint design choice. PWM is constrained to 0–100%. The 250 RPM reference target is below the source motor's nominal 300 RPM; at the converted model gain it requires about 86.0% steady-state PWM. This is an illustrative reference operating point, not a validated target for our own robot.
 
-**Instructor approval is still required:** this source is a peer-reviewed, open-access experimental dataset, but it describes a different motor/driver platform. The team must ask whether a literature-derived reference model is acceptable instead of measurements from its own Micromouse. If not accepted, use the P3 encoder/PWM step test on the actual robot and replace K and tau.
-
-**Exact approval question for the instructor:** “For the My System part, may our team use the cited peer-reviewed OpenMCT DC motor experimental dataset as a clearly labelled reference model, with its PWM-count-to-duty conversion documented, instead of measuring our own Micromouse motor? We will identify it as published external data, not as our own experiment.”
+**Source-use and attribution:** The model is explicitly identified as a published external reference, with the article, DOI, and original dataset linked above. It is not presented as a measurement made by our team. This follows the same transparent documentation principle used when a project relies on a published datasheet or experimental dataset.
 
 ### Homework 2 GitHub issues
 
